@@ -114,6 +114,17 @@ const languages = [
 ]
 
 const themes = [
+  { value: 'vercel', label: 'Vercel', category: 'dark' },
+  { value: 'supabase', label: 'Supabase', category: 'dark' },
+  { value: 'tailwind', label: 'Tailwind', category: 'dark' },
+  { value: 'trigger', label: 'Trigger.dev', category: 'dark' },
+  { value: 'clerk', label: 'Clerk', category: 'dark' },
+  { value: 'mintlify', label: 'Mintlify', category: 'dark' },
+  { value: 'prisma', label: 'Prisma', category: 'dark' },
+  { value: 'openai', label: 'OpenAI', category: 'dark' },
+  { value: 'elevenlabs', label: 'ElevenLabs', category: 'dark' },
+  { value: 'resend', label: 'Resend', category: 'dark' },
+  { value: 'nuxt', label: 'Nuxt', category: 'dark' },
   { value: 'monokai', label: 'Monokai', category: 'dark' },
   { value: 'dracula', label: 'Dracula', category: 'dark' },
   { value: 'nightOwl', label: 'Night Owl', category: 'dark' },
