@@ -8,26 +8,34 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Snipp - Turn Code into Beautiful Images',
+  title: 'Snippet - Turn Code into Beautiful Images',
   description: 'A clean and minimal tool for turning your code into beautiful, shareable images',
   openGraph: {
-    title: 'Snipp - Turn Code into Beautiful Images',
+    title: 'Snippet - Turn Code into Beautiful Images',
     description: 'A clean and minimal tool for turning your code into beautiful, shareable images',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Snipp - Turn Code into Beautiful Images',
+        alt: 'Snippet - Turn Code into Beautiful Images',
       },
     ],
     url: 'https://snippet.avikmukherjee.me',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Snipp - Turn Code into Beautiful Images',
+    title: 'Snippet - Turn Code into Beautiful Images',
     description: 'A clean and minimal tool for turning your code into beautiful, shareable images',
     images: ['/og-image.png'],
+  },
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+    other: {
+      rel: 'icon',
+      url: '/icon.png',
+    },
   },
 }
 
