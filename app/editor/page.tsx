@@ -56,10 +56,24 @@ export default function EditorPage() {
 
   // Listen for animation frame progress events during video export
   useEffect(() => {
+    let rafId: number | null = null
+    let pendingProgress: number | null = null
+
     const handleAnimationFrameProgress = (e: Event) => {
       const customEvent = e as CustomEvent<number>
       if (customEvent.detail !== undefined) {
-        setAnimationProgress(customEvent.detail)
+        pendingProgress = customEvent.detail
+        
+        // Use requestAnimationFrame for smooth updates
+        if (rafId === null) {
+          rafId = requestAnimationFrame(() => {
+            if (pendingProgress !== null) {
+              setAnimationProgress(pendingProgress)
+              pendingProgress = null
+            }
+            rafId = null
+          })
+        }
       }
     }
 
@@ -67,6 +81,9 @@ export default function EditorPage() {
 
     return () => {
       window.removeEventListener('animation-frame-progress', handleAnimationFrameProgress as EventListener)
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId)
+      }
     }
   }, [])
 
