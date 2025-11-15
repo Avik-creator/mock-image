@@ -94,21 +94,22 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
         >
           {showWindowControls && (
             <div 
-              className="flex items-center justify-between gap-2 px-4 py-3 border-b"
+              className="flex items-center gap-2 px-4 py-3 border-b relative"
               style={{ 
                 backgroundColor: controlsBg,
                 borderColor: borderColor,
               }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
                 <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
                 <div className="w-3 h-3 rounded-full bg-[#28c840]" />
               </div>
               {windowTitle && (
                 <div 
-                  className="text-xs font-medium truncate flex-1 text-center px-4"
+                  className="absolute left-1/2 -translate-x-1/2 text-xs font-medium truncate max-w-[60%]"
                   style={{ color: isLightTheme ? '#666666' : '#cccccc' }}
+                  title={windowTitle}
                 >
                   {windowTitle}
                 </div>

@@ -420,12 +420,12 @@ export default function EditorPage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+        <div className="w-full flex h-14 items-center justify-between px-4">
+          <Link href="/" className="flex items-center gap-2 font-semibold flex-shrink-0">
             <span className="text-lg">{'</>'}</span>
             <span>Snippet</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             {playground !== 'code' && currentImage && animationLayers.length > 0 && (
               <Button
                 variant="outline"
