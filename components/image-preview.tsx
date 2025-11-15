@@ -64,14 +64,31 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
       ? calculateAnimationStyles(animationLayers, animationProgress, totalDuration)
       : {}
 
+    // Determine background style
+    const getBackgroundStyle = () => {
+      if (background.startsWith('/')) {
+        // Image background
+        return {
+          backgroundImage: `url(${background})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }
+      } else if (background.startsWith('linear-gradient') || background.startsWith('radial-gradient')) {
+        // Gradient background
+        return { backgroundImage: background }
+      } else {
+        // Solid color background
+        return { backgroundColor: background }
+      }
+    }
+
     return (
       <div className="w-full">
         <div
           ref={ref}
           style={{
-            ...(background.startsWith('linear-gradient') || background.startsWith('radial-gradient')
-              ? { backgroundImage: background }
-              : { backgroundColor: background }),
+            ...getBackgroundStyle(),
             padding: `${padding}px`,
           }}
           className="flex items-center justify-center min-h-[600px] rounded-xl"

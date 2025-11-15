@@ -51,13 +51,30 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
     const controlsBg = isLightTheme ? '#f5f5f5' : '#2d2d2d'
     const borderColor = isLightTheme ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)'
 
+    // Determine background style
+    const getBackgroundStyle = () => {
+      if (background.startsWith('/')) {
+        // Image background
+        return {
+          backgroundImage: `url(${background})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }
+      } else if (background.startsWith('linear-gradient') || background.startsWith('radial-gradient')) {
+        // Gradient background
+        return { backgroundImage: background }
+      } else {
+        // Solid color background
+        return { backgroundColor: background }
+      }
+    }
+
     return (
       <div
         ref={ref}
         style={{
-          ...(background.startsWith('linear-gradient') || background.startsWith('radial-gradient')
-            ? { backgroundImage: background }
-            : { backgroundColor: background }),
+          ...getBackgroundStyle(),
           padding: `${padding}px`,
         }}
         className="inline-block"

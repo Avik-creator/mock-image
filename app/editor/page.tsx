@@ -63,7 +63,7 @@ export default function EditorPage() {
       const customEvent = e as CustomEvent<number>
       if (customEvent.detail !== undefined) {
         pendingProgress = customEvent.detail
-        
+
         // Use requestAnimationFrame for smooth updates
         if (rafId === null) {
           rafId = requestAnimationFrame(() => {
@@ -183,7 +183,7 @@ export default function EditorPage() {
         },
         body: JSON.stringify({ url: validUrl }),
       })
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(
@@ -192,7 +192,7 @@ export default function EditorPage() {
       }
 
       const blob = await response.blob()
-      
+
       if (!blob || blob.size === 0) {
         throw new Error('Received empty screenshot')
       }
@@ -208,8 +208,8 @@ export default function EditorPage() {
       console.error('URL capture error:', error)
       toast({
         title: 'Error',
-        description: error instanceof Error 
-          ? error.message 
+        description: error instanceof Error
+          ? error.message
           : 'Failed to capture screenshot. Please ensure the URL is accessible and try again.',
         variant: 'destructive',
       })
@@ -227,11 +227,11 @@ export default function EditorPage() {
       })
       return
     }
-    
+
     setIsExporting(true)
     setExportProgress(0)
     setAnimationProgress(0) // Reset animation progress at start
-    
+
     try {
       const videoBlob = await exportAsVideo(
         previewRef.current,
@@ -240,14 +240,14 @@ export default function EditorPage() {
         30,
         (progress) => setExportProgress(progress)
       )
-      
+
       const url = URL.createObjectURL(videoBlob)
       const link = document.createElement('a')
       link.download = `snipp-animation-${Date.now()}.webm`
       link.href = url
       link.click()
       URL.revokeObjectURL(url)
-      
+
       toast({
         title: 'Success',
         description: 'Video exported successfully!',
@@ -268,14 +268,14 @@ export default function EditorPage() {
 
   const handleExportImage = async () => {
     if (!previewRef.current) return
-    
+
     try {
       const html2canvas = (await import('html2canvas-pro')).default
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: null,
         scale: 2,
       })
-      
+
       canvas.toBlob((blob) => {
         if (blob) {
           const url = URL.createObjectURL(blob)
@@ -302,14 +302,14 @@ export default function EditorPage() {
 
   const handleCopyImage = async () => {
     if (!previewRef.current) return
-    
+
     try {
       const html2canvas = (await import('html2canvas-pro')).default
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: null,
         scale: 2,
       })
-      
+
       canvas.toBlob(async (blob) => {
         if (blob) {
           await navigator.clipboard.write([
@@ -340,7 +340,7 @@ export default function EditorPage() {
         <div className="container flex h-14 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <span className="text-lg">{'</>'}</span>
-            <span>Snipp</span>
+            <span>Snippet</span>
           </Link>
           <div className="flex items-center gap-2">
             <ModeToggle />
@@ -361,38 +361,35 @@ export default function EditorPage() {
                 </Button>
               </Link>
             </div>
-            
+
             {/* Playground Toggle */}
             <div className="inline-flex items-center gap-1 bg-muted p-1 rounded-lg w-full">
               <button
                 onClick={() => setPlayground('code')}
-                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
-                  playground === 'code'
+                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${playground === 'code'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 <Code className="h-3.5 w-3.5" />
                 Code
               </button>
               <button
                 onClick={() => setPlayground('image')}
-                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
-                  playground === 'image'
+                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${playground === 'image'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 <Image className="h-3.5 w-3.5" />
                 Image
               </button>
               <button
                 onClick={() => setPlayground('url')}
-                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
-                  playground === 'url'
+                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${playground === 'url'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 <Globe className="h-3.5 w-3.5" />
                 URL
@@ -450,9 +447,9 @@ export default function EditorPage() {
           {/* Export Actions at Bottom */}
           <div className="p-4 border-t space-y-2">
             {playground !== 'code' && currentImage && animationLayers.length > 0 && (
-              <Button 
-                variant="default" 
-                size="sm" 
+              <Button
+                variant="default"
+                size="sm"
                 onClick={handleExportVideo}
                 disabled={isExporting}
                 className="w-full gap-2"
@@ -461,18 +458,18 @@ export default function EditorPage() {
                 {isExporting ? `Exporting... ${Math.round(exportProgress)}%` : 'Export as Video'}
               </Button>
             )}
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleCopyImage}
               className="w-full gap-2"
             >
               <Copy className="h-4 w-4" />
               Copy to Clipboard
             </Button>
-            <Button 
-              variant="default" 
-              size="sm" 
+            <Button
+              variant="default"
+              size="sm"
               onClick={handleExportImage}
               className="w-full gap-2"
             >
