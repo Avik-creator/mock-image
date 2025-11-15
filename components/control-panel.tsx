@@ -37,16 +37,27 @@ const languages = [
 ]
 
 const themes = [
-  { value: 'monokai', label: 'Monokai' },
-  { value: 'github', label: 'GitHub' },
-  { value: 'dracula', label: 'Dracula' },
-  { value: 'nightOwl', label: 'Night Owl' },
-  { value: 'oceanicNext', label: 'Oceanic Next' },
-  { value: 'atomDark', label: 'Atom Dark' },
-  { value: 'synthwave', label: 'Synthwave 84' },
-  { value: 'vsDark', label: 'VS Dark' },
-  { value: 'vsLight', label: 'VS Light' },
-  { value: 'duotoneLight', label: 'Duotone Light' },
+  { value: 'monokai', label: 'Monokai', category: 'dark' },
+  { value: 'dracula', label: 'Dracula', category: 'dark' },
+  { value: 'nightOwl', label: 'Night Owl', category: 'dark' },
+  { value: 'oceanicNext', label: 'Oceanic Next', category: 'dark' },
+  { value: 'atomDark', label: 'Atom Dark', category: 'dark' },
+  { value: 'synthwave', label: 'Synthwave 84', category: 'dark' },
+  { value: 'vsDark', label: 'VS Code Dark', category: 'dark' },
+  { value: 'vscDarkPlus', label: 'VS Code Dark+', category: 'dark' },
+  { value: 'duotoneDark', label: 'Duotone Dark', category: 'dark' },
+  { value: 'shadesOfPurple', label: 'Shades of Purple', category: 'dark' },
+  { value: 'palenight', label: 'Palenight', category: 'dark' },
+  { value: 'materialDark', label: 'Material Dark', category: 'dark' },
+  { value: 'materialOceanic', label: 'Material Oceanic', category: 'dark' },
+  { value: 'nord', label: 'Nord', category: 'dark' },
+  { value: 'zTouch', label: 'zTouch', category: 'dark' },
+  { value: 'pojoaque', label: 'Pojoaque', category: 'dark' },
+  { value: 'github', label: 'GitHub', category: 'light' },
+  { value: 'vsLight', label: 'VS Code Light', category: 'light' },
+  { value: 'duotoneLight', label: 'Duotone Light', category: 'light' },
+  { value: 'materialLight', label: 'Material Light', category: 'light' },
+  { value: 'oneLight', label: 'One Light', category: 'light' },
 ]
 
 const backgrounds = [
@@ -119,8 +130,19 @@ export function ControlPanel({
               <SelectTrigger className="h-9">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                {themes.map((t) => (
+              <SelectContent className="max-h-[400px]">
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Dark Themes
+                </div>
+                {themes.filter(t => t.category === 'dark').map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-2">
+                  Light Themes
+                </div>
+                {themes.filter(t => t.category === 'light').map((t) => (
                   <SelectItem key={t.value} value={t.value}>
                     {t.label}
                   </SelectItem>
