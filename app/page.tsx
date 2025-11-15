@@ -27,8 +27,8 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="w-full flex items-center justify-center px-4 py-12 md:py-24">
-        <div className="w-full max-w-4xl text-center flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+      <section className="w-full flex items-center justify-center px-4 pt-8 pb-12 md:pt-16 md:pb-24">
+        <div className="w-full max-w-4xl text-center flex flex-col items-center justify-center">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-1.5 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
             <span>Turn your code into beautiful images</span>

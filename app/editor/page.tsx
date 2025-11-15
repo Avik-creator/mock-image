@@ -301,17 +301,45 @@ export default function EditorPage() {
   }
 
   const handleCopyImage = async () => {
-    if (!previewRef.current) return
+    if (!previewRef.current) {
+      toast({
+        title: 'Error',
+        description: 'No preview available to copy',
+        variant: 'destructive',
+      })
+      return
+    }
 
     try {
+      // Check if clipboard API is available
+      if (!navigator.clipboard || !window.ClipboardItem) {
+        toast({
+          title: 'Error',
+          description: 'Clipboard API not supported in this browser',
+          variant: 'destructive',
+        })
+        return
+      }
+
       const html2canvas = (await import('html2canvas-pro')).default
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: null,
         scale: 2,
+        useCORS: true,
+        allowTaint: false,
       })
 
       canvas.toBlob(async (blob) => {
-        if (blob) {
+        if (!blob) {
+          toast({
+            title: 'Error',
+            description: 'Failed to generate image',
+            variant: 'destructive',
+          })
+          return
+        }
+
+        try {
           await navigator.clipboard.write([
             new ClipboardItem({ 'image/png': blob })
           ])
@@ -319,13 +347,20 @@ export default function EditorPage() {
             title: 'Success',
             description: 'Image copied to clipboard!',
           })
+        } catch (clipboardError) {
+          console.error('Clipboard write error:', clipboardError)
+          toast({
+            title: 'Error',
+            description: 'Failed to copy to clipboard. Please try again.',
+            variant: 'destructive',
+          })
         }
-      })
+      }, 'image/png')
     } catch (error) {
-      console.error('[v0] Copy image error:', error)
+      console.error('Copy image error:', error)
       toast({
         title: 'Error',
-        description: 'Failed to copy image',
+        description: error instanceof Error ? error.message : 'Failed to copy image',
         variant: 'destructive',
       })
     }
@@ -367,8 +402,8 @@ export default function EditorPage() {
               <button
                 onClick={() => setPlayground('code')}
                 className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${playground === 'code'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <Code className="h-3.5 w-3.5" />
@@ -377,8 +412,8 @@ export default function EditorPage() {
               <button
                 onClick={() => setPlayground('image')}
                 className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${playground === 'image'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <Image className="h-3.5 w-3.5" />
@@ -387,8 +422,8 @@ export default function EditorPage() {
               <button
                 onClick={() => setPlayground('url')}
                 className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${playground === 'url'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <Globe className="h-3.5 w-3.5" />
