@@ -24,16 +24,85 @@ interface ControlPanelProps {
 }
 
 const languages = [
+  // Web Technologies
   { value: 'javascript', label: 'JavaScript' },
   { value: 'typescript', label: 'TypeScript' },
   { value: 'jsx', label: 'JSX' },
   { value: 'tsx', label: 'TSX' },
   { value: 'css', label: 'CSS' },
   { value: 'html', label: 'HTML' },
-  { value: 'python', label: 'Python' },
   { value: 'json', label: 'JSON' },
+  { value: 'xml', label: 'XML' },
+  { value: 'yaml', label: 'YAML' },
+  { value: 'markdown', label: 'Markdown' },
+  { value: 'graphql', label: 'GraphQL' },
+  
+  // Programming Languages
+  { value: 'python', label: 'Python' },
+  { value: 'java', label: 'Java' },
+  { value: 'csharp', label: 'C#' },
+  { value: 'cpp', label: 'C++' },
+  { value: 'c', label: 'C' },
+  { value: 'go', label: 'Go' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'ruby', label: 'Ruby' },
+  { value: 'php', label: 'PHP' },
+  { value: 'swift', label: 'Swift' },
+  { value: 'kotlin', label: 'Kotlin' },
+  { value: 'scala', label: 'Scala' },
+  { value: 'dart', label: 'Dart' },
+  { value: 'r', label: 'R' },
+  { value: 'matlab', label: 'MATLAB' },
+  { value: 'lua', label: 'Lua' },
+  { value: 'perl', label: 'Perl' },
+  { value: 'haskell', label: 'Haskell' },
+  { value: 'clojure', label: 'Clojure' },
+  { value: 'elixir', label: 'Elixir' },
+  { value: 'erlang', label: 'Erlang' },
+  { value: 'fsharp', label: 'F#' },
+  { value: 'ocaml', label: 'OCaml' },
+  { value: 'julia', label: 'Julia' },
+  { value: 'nim', label: 'Nim' },
+  { value: 'crystal', label: 'Crystal' },
+  
+  // Shell & Scripting
   { value: 'bash', label: 'Bash' },
+  { value: 'shell', label: 'Shell' },
+  { value: 'powershell', label: 'PowerShell' },
+  { value: 'zsh', label: 'Zsh' },
+  
+  // Database & Query Languages
   { value: 'sql', label: 'SQL' },
+  { value: 'plsql', label: 'PL/SQL' },
+  { value: 'mongodb', label: 'MongoDB' },
+  
+  // Configuration & Data Formats
+  { value: 'toml', label: 'TOML' },
+  { value: 'ini', label: 'INI' },
+  { value: 'properties', label: 'Properties' },
+  { value: 'diff', label: 'Diff' },
+  
+  // Domain-Specific Languages
+  { value: 'docker', label: 'Docker' },
+  { value: 'dockerfile', label: 'Dockerfile' },
+  { value: 'nginx', label: 'Nginx' },
+  { value: 'apache', label: 'Apache' },
+  { value: 'makefile', label: 'Makefile' },
+  { value: 'vim', label: 'Vim Script' },
+  { value: 'regex', label: 'Regex' },
+  
+  // Styling & Templates
+  { value: 'scss', label: 'SCSS' },
+  { value: 'sass', label: 'Sass' },
+  { value: 'less', label: 'Less' },
+  { value: 'stylus', label: 'Stylus' },
+  
+  // Assembly & Low-Level
+  { value: 'asm6502', label: '6502 Assembly' },
+  { value: 'armasm', label: 'ARM Assembly' },
+  
+  // Other
+  { value: 'plaintext', label: 'Plain Text' },
 ]
 
 const themes = [
