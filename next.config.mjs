@@ -6,10 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Optimize for Vercel
-  experimental: {
-    serverComponentsExternalPackages: ['@sparticuz/chromium', 'puppeteer-core'],
-  },
+  // Optimize for Vercel - external packages for server components
+  serverExternalPackages: ['@sparticuz/chromium', 'puppeteer-core'],
 }
 
 export default nextConfig

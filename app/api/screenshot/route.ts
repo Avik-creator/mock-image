@@ -2,9 +2,6 @@ import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Configure Chromium for Vercel
-chromium.setGraphicsMode(false);
-
 export const maxDuration = 30; // Vercel serverless function max duration
 
 export async function POST(req: NextRequest) {

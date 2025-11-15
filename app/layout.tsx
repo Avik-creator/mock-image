@@ -10,23 +10,24 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'Snipp - Turn Code into Beautiful Images',
   description: 'A clean and minimal tool for turning your code into beautiful, shareable images',
-  generator: 'v0.app',
-  icons: {
-    icon: [
+  openGraph: {
+    title: 'Snipp - Turn Code into Beautiful Images',
+    description: 'A clean and minimal tool for turning your code into beautiful, shareable images',
+    images: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Snipp - Turn Code into Beautiful Images',
       },
     ],
-    apple: '/apple-icon.png',
+    url: 'https://snippet.avikmukherjee.me',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Snipp - Turn Code into Beautiful Images',
+    description: 'A clean and minimal tool for turning your code into beautiful, shareable images',
+    images: ['/og-image.png'],
   },
 }
 
