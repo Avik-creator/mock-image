@@ -157,14 +157,14 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           className={`flex ${uploadedImage ? 'items-start justify-center' : 'items-center justify-center'} min-h-[600px] rounded-xl`}
         >
           {!uploadedImage ? (
-            <div className="text-center w-full">
+            <div className="text-center w-full max-w-2xl mx-auto">
               <div
-                className={`bg-white/80 backdrop-blur-sm border-2 border-dashed transition-all p-16 cursor-pointer ${
+                className={`bg-card border-2 border-dashed transition-all p-12 md:p-16 cursor-pointer ${
                   isDragging 
-                    ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/10' 
-                    : 'border-zinc-300 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-600'
+                    ? 'border-primary bg-primary/5 scale-[1.02]' 
+                    : 'border-border hover:border-primary/50 hover:bg-accent/30'
                 } ${
-                  rounded ? 'rounded-3xl' : ''
+                  rounded ? 'rounded-2xl' : 'rounded-lg'
                 }`}
                 onClick={(e) => {
                   // Only trigger if clicking directly on the div, not on the button or its children
@@ -178,18 +178,34 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <Upload className={`h-16 w-16 mx-auto mb-4 ${isDragging ? 'text-purple-500' : 'text-zinc-400'}`} />
-                <p className="text-lg font-semibold mb-2 text-zinc-900 dark:text-zinc-100">
-                  {isDragging ? 'Drop image here' : 'Upload an image'}
-                </p>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-                  Click to browse or drag and drop
-                </p>
-                <Button 
-                  onClick={handleUploadClick}
-                >
-                  Choose File
-                </Button>
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <div className={`p-4 rounded-full transition-colors ${
+                    isDragging 
+                      ? 'bg-primary/10' 
+                      : 'bg-muted'
+                  }`}>
+                    <Upload className={`h-12 w-12 transition-colors ${
+                      isDragging 
+                        ? 'text-primary' 
+                        : 'text-muted-foreground'
+                    }`} />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xl font-semibold text-foreground">
+                      {isDragging ? 'Drop image here' : 'Upload an image'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Click to browse or drag and drop your image
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleUploadClick}
+                    size="lg"
+                    className="mt-4"
+                  >
+                    Choose File
+                  </Button>
+                </div>
               </div>
               <input
                 ref={fileInputRef}
@@ -202,7 +218,7 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           ) : (
             <div
               style={animationStyles}
-              className={`bg-white shadow-2xl overflow-hidden ${rounded ? 'rounded-2xl' : ''} w-full max-w-6xl`}
+              className={`bg-card shadow-2xl overflow-hidden ${rounded ? 'rounded-2xl' : 'rounded-lg'} w-full max-w-6xl border border-border`}
             >
               <img
                 src={uploadedImage || "/placeholder.svg"}
