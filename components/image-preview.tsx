@@ -91,7 +91,7 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
             ...getBackgroundStyle(),
             padding: `${padding}px`,
           }}
-          className="flex items-center justify-center min-h-[600px] rounded-xl"
+          className={`flex ${uploadedImage ? 'items-start justify-center' : 'items-center justify-center'} min-h-[600px] rounded-xl`}
         >
           {!uploadedImage ? (
             <div className="text-center">
@@ -124,12 +124,13 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           ) : (
             <div
               style={animationStyles}
-              className={`bg-white shadow-2xl overflow-hidden ${rounded ? 'rounded-2xl' : ''}`}
+              className={`bg-white shadow-2xl overflow-hidden ${rounded ? 'rounded-2xl' : ''} w-full max-w-6xl`}
             >
               <img
                 src={uploadedImage || "/placeholder.svg"}
                 alt="Uploaded preview"
-                className="max-w-full max-h-[500px] object-contain"
+                className="w-full h-auto object-contain block"
+                style={{ display: 'block' }}
               />
             </div>
           )}
