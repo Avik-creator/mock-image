@@ -6,7 +6,7 @@ import { ImagePreview } from '@/components/image-preview'
 import { ControlPanel } from '@/components/control-panel'
 import { AnimationTimeline } from '@/components/animation-timeline'
 import { Button } from '@/components/ui/button'
-import { Download, Copy, Code, Image, Video, ArrowLeft, Globe } from 'lucide-react'
+import { Download, Copy, Code, Image, Video, ArrowLeft, Globe, GripVertical } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
 import { AnimationLayer, AnimationType } from '@/types/animation'
@@ -43,6 +43,8 @@ export default function EditorPage() {
   const [rounded, setRounded] = useState(true)
   const [showLineNumbers, setShowLineNumbers] = useState(false)
   const [showWindowControls, setShowWindowControls] = useState(true)
+  const [windowTitle, setWindowTitle] = useState('')
+  const [insertedImage, setInsertedImage] = useState<string | null>(null)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
   const [animationProgress, setAnimationProgress] = useState(0)
@@ -424,6 +426,36 @@ export default function EditorPage() {
             <span>Snippet</span>
           </Link>
           <div className="flex items-center gap-2">
+            {playground !== 'code' && currentImage && animationLayers.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportVideo}
+                disabled={isExporting}
+                className="gap-2"
+              >
+                <Video className="h-4 w-4" />
+                {isExporting ? `Exporting... ${Math.round(exportProgress)}%` : 'Export Video'}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopyImage}
+              className="gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Copy
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleExportImage}
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
             <ModeToggle />
           </div>
         </div>
@@ -525,6 +557,8 @@ export default function EditorPage() {
               rounded={rounded}
               showLineNumbers={showLineNumbers}
               showWindowControls={showWindowControls}
+              windowTitle={windowTitle}
+              insertedImage={insertedImage}
               onLanguageChange={setLanguage}
               onThemeChange={setTheme}
               onBackgroundChange={setBackground}
@@ -532,47 +566,73 @@ export default function EditorPage() {
               onRoundedChange={setRounded}
               onLineNumbersChange={setShowLineNumbers}
               onWindowControlsChange={setShowWindowControls}
+              onWindowTitleChange={setWindowTitle}
+              onImageInsert={playground === 'code' ? setInsertedImage : undefined}
             />
           </div>
 
-          {/* Export Actions at Bottom */}
-          <div className="p-4 border-t space-y-2">
-            {playground !== 'code' && currentImage && animationLayers.length > 0 && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleExportVideo}
-                disabled={isExporting}
-                className="w-full gap-2"
-              >
-                <Video className="h-4 w-4" />
-                {isExporting ? `Exporting... ${Math.round(exportProgress)}%` : 'Export as Video'}
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopyImage}
-              className="w-full gap-2"
-            >
-              <Copy className="h-4 w-4" />
-              Copy to Clipboard
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleExportImage}
-              className="w-full gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export as Image
-            </Button>
-          </div>
         </aside>
 
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
+          <div className="flex-1 flex items-center justify-center p-8 overflow-auto relative">
+            {/* Padding Handles Overlay */}
+            <div className="absolute inset-0 pointer-events-none z-10">
+              {/* Left Handle */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-8 h-16 rounded-r-lg bg-background/80 backdrop-blur-sm border-r-2 border-primary shadow-lg flex items-center justify-center cursor-ew-resize pointer-events-auto hover:bg-background/90 transition-all group"
+                style={{ left: `${padding}px`, transform: 'translate(-50%, -50%)' }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  const startX = e.clientX
+                  const startPadding = padding
+
+                  const handleMouseMove = (moveEvent: MouseEvent) => {
+                    const deltaX = moveEvent.clientX - startX
+                    const newPadding = Math.max(16, Math.min(128, startPadding + deltaX))
+                    setPadding(newPadding)
+                  }
+
+                  const handleMouseUp = () => {
+                    window.removeEventListener('mousemove', handleMouseMove)
+                    window.removeEventListener('mouseup', handleMouseUp)
+                  }
+
+                  window.addEventListener('mousemove', handleMouseMove)
+                  window.addEventListener('mouseup', handleMouseUp)
+                }}
+              >
+                <GripVertical className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+              </div>
+
+              {/* Right Handle */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 right-0 w-8 h-16 rounded-l-lg bg-background/80 backdrop-blur-sm border-l-2 border-primary shadow-lg flex items-center justify-center cursor-ew-resize pointer-events-auto hover:bg-background/90 transition-all group"
+                style={{ right: `${padding}px`, transform: 'translate(50%, -50%)' }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  const startX = e.clientX
+                  const startPadding = padding
+
+                  const handleMouseMove = (moveEvent: MouseEvent) => {
+                    const deltaX = startX - moveEvent.clientX
+                    const newPadding = Math.max(16, Math.min(128, startPadding + deltaX))
+                    setPadding(newPadding)
+                  }
+
+                  const handleMouseUp = () => {
+                    window.removeEventListener('mousemove', handleMouseMove)
+                    window.removeEventListener('mouseup', handleMouseUp)
+                  }
+
+                  window.addEventListener('mousemove', handleMouseMove)
+                  window.addEventListener('mouseup', handleMouseUp)
+                }}
+              >
+                <GripVertical className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+              </div>
+            </div>
+
             {playground === 'url' || playground === 'image' ? (
               <ImagePreview
                 ref={previewRef}
@@ -596,7 +656,10 @@ export default function EditorPage() {
                 rounded={rounded}
                 showLineNumbers={showLineNumbers}
                 showWindowControls={showWindowControls}
+                windowTitle={windowTitle}
+                insertedImage={insertedImage}
                 onChange={setCode}
+                onImageInsert={setInsertedImage}
               />
             )}
           </div>

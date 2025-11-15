@@ -129,7 +129,9 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
 
     // Determine background style
     const getBackgroundStyle = () => {
-      if (background.startsWith('/')) {
+      if (background === 'transparent') {
+        return { backgroundColor: 'transparent' }
+      } else if (background.startsWith('/')) {
         // Image background
         return {
           backgroundImage: `url(${background})`,

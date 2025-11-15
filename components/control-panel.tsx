@@ -4,6 +4,10 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Upload, X } from 'lucide-react'
+import { useRef } from 'react'
 
 interface ControlPanelProps {
   playground: 'code' | 'image'
@@ -14,6 +18,8 @@ interface ControlPanelProps {
   rounded: boolean
   showLineNumbers: boolean
   showWindowControls: boolean
+  windowTitle?: string
+  insertedImage?: string | null
   onLanguageChange: (value: string) => void
   onThemeChange: (value: string) => void
   onBackgroundChange: (value: string) => void
@@ -21,6 +27,8 @@ interface ControlPanelProps {
   onRoundedChange: (value: boolean) => void
   onLineNumbersChange: (value: boolean) => void
   onWindowControlsChange: (value: boolean) => void
+  onWindowTitleChange?: (value: string) => void
+  onImageInsert?: (image: string | null) => void
 }
 
 const languages = [
@@ -149,6 +157,7 @@ const backgrounds = [
   { value: 'radial-gradient(circle at top right, #43e97b 0%, #38f9d7 100%)', label: 'Radial Teal', type: 'gradient' },
   
   // Solid Colors
+  { value: 'transparent', label: 'Transparent', type: 'color' },
   { value: '#1e1e1e', label: 'Dark', type: 'color' },
   { value: '#18181b', label: 'Zinc Dark', type: 'color' },
   { value: '#0a0a0a', label: 'Almost Black', type: 'color' },
@@ -207,6 +216,17 @@ const backgrounds = [
   { value: '/mac/mac7.jpg', label: 'Mac 7', type: 'image' },
 ]
 
+const paddingPresets = [
+  { value: 16, label: '16px' },
+  { value: 32, label: '32px' },
+  { value: 48, label: '48px' },
+  { value: 64, label: '64px' },
+  { value: 80, label: '80px' },
+  { value: 96, label: '96px' },
+  { value: 112, label: '112px' },
+  { value: 128, label: '128px' },
+]
+
 export function ControlPanel({
   playground,
   language,
@@ -216,6 +236,8 @@ export function ControlPanel({
   rounded,
   showLineNumbers,
   showWindowControls,
+  windowTitle,
+  insertedImage,
   onLanguageChange,
   onThemeChange,
   onBackgroundChange,
@@ -223,7 +245,10 @@ export function ControlPanel({
   onRoundedChange,
   onLineNumbersChange,
   onWindowControlsChange,
+  onWindowTitleChange,
+  onImageInsert,
 }: ControlPanelProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
   return (
     <div className="space-y-6">
       {playground === 'code' && (
@@ -254,17 +279,17 @@ export function ControlPanel({
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
                 <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                  Dark Themes
+                  Light Themes
                 </div>
-                {themes.filter(t => t.category === 'dark').map((t) => (
+                {themes.filter(t => t.category === 'light').map((t) => (
                   <SelectItem key={t.value} value={t.value}>
                     {t.label}
                   </SelectItem>
                 ))}
                 <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-2">
-                  Light Themes
+                  Dark Themes
                 </div>
-                {themes.filter(t => t.category === 'light').map((t) => (
+                {themes.filter(t => t.category === 'dark').map((t) => (
                   <SelectItem key={t.value} value={t.value}>
                     {t.label}
                   </SelectItem>
@@ -292,6 +317,15 @@ export function ControlPanel({
                       alt={bg.label}
                       className="w-8 h-8 rounded border border-border object-cover"
                     />
+                  ) : bg.value === 'transparent' ? (
+                    <div
+                      className="w-4 h-4 rounded border-2 border-dashed border-border bg-checkerboard"
+                      style={{
+                        backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
+                        backgroundSize: '8px 8px',
+                        backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px'
+                      }}
+                    />
                   ) : (
                     <div
                       className="w-4 h-4 rounded border border-border"
@@ -316,6 +350,21 @@ export function ControlPanel({
           <Label className="text-xs font-medium text-muted-foreground">Padding</Label>
           <span className="text-xs text-muted-foreground">{padding}px</span>
         </div>
+        <div className="grid grid-cols-4 gap-1.5 mb-2">
+          {paddingPresets.map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => onPaddingChange(preset.value)}
+              className={`px-2 py-1.5 text-xs rounded-md border transition-colors ${
+                padding === preset.value
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background border-border hover:bg-accent'
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
         <Slider
           value={[padding]}
           onValueChange={([value]) => onPaddingChange(value)}
@@ -324,6 +373,9 @@ export function ControlPanel({
           step={8}
           className="py-1"
         />
+        <div className="text-xs text-muted-foreground pt-1">
+          💡 Drag handles on preview to adjust padding
+        </div>
       </div>
 
       {/* Toggles */}
@@ -341,6 +393,66 @@ export function ControlPanel({
 
         {playground === 'code' && (
           <>
+            {onWindowTitleChange && (
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Window Title</Label>
+                <Input
+                  value={windowTitle || ''}
+                  onChange={(e) => onWindowTitleChange(e.target.value)}
+                  placeholder="e.g., app.js"
+                  className="h-9 text-sm"
+                />
+              </div>
+            )}
+
+            {onImageInsert && (
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Insert Image</Label>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => onImageInsert(null)}
+                    disabled={!insertedImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file && file.type.startsWith('image/')) {
+                      const reader = new FileReader()
+                      reader.onload = (event) => {
+                        const result = event.target?.result as string
+                        if (result) {
+                          onImageInsert(result)
+                        }
+                      }
+                      reader.readAsDataURL(file)
+                    }
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ''
+                    }
+                  }}
+                  className="hidden"
+                />
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <Label htmlFor="lineNumbers" className="text-xs font-medium text-muted-foreground cursor-pointer">
                 Line Numbers

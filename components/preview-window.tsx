@@ -12,7 +12,10 @@ interface PreviewWindowProps {
   rounded: boolean
   showLineNumbers: boolean
   showWindowControls: boolean
+  windowTitle?: string
+  insertedImage?: string | null
   onChange?: (code: string) => void
+  onImageInsert?: (image: string | null) => void
 }
 
 const themeMap: Record<string, any> = {
@@ -41,7 +44,7 @@ const themeMap: Record<string, any> = {
 
 export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
   function PreviewWindow(
-    { code, language, theme, background, padding, rounded, showLineNumbers, showWindowControls, onChange },
+    { code, language, theme, background, padding, rounded, showLineNumbers, showWindowControls, windowTitle, insertedImage, onChange, onImageInsert },
     ref
   ) {
     const selectedTheme = themeMap[theme] || themes.vsDark
@@ -53,7 +56,9 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
 
     // Determine background style
     const getBackgroundStyle = () => {
-      if (background.startsWith('/')) {
+      if (background === 'transparent') {
+        return { backgroundColor: 'transparent' }
+      } else if (background.startsWith('/')) {
         // Image background
         return {
           backgroundImage: `url(${background})`,
@@ -89,21 +94,41 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
         >
           {showWindowControls && (
             <div 
-              className="flex items-center gap-2 px-4 py-3 border-b"
+              className="flex items-center justify-between gap-2 px-4 py-3 border-b"
               style={{ 
                 backgroundColor: controlsBg,
                 borderColor: borderColor,
               }}
             >
-              <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-              <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-              <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+                <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
+                <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+              </div>
+              {windowTitle && (
+                <div 
+                  className="text-xs font-medium truncate flex-1 text-center px-4"
+                  style={{ color: isLightTheme ? '#666666' : '#cccccc' }}
+                >
+                  {windowTitle}
+                </div>
+              )}
             </div>
           )}
           <div 
             className="p-6 overflow-x-auto relative"
             style={{ backgroundColor: themeBg }}
           >
+            {insertedImage && (
+              <div className="mb-4 flex justify-center">
+                <img 
+                  src={insertedImage} 
+                  alt="Inserted" 
+                  className="max-w-full h-auto rounded-lg shadow-lg"
+                  style={{ maxHeight: '400px' }}
+                />
+              </div>
+            )}
             {onChange && (
               <textarea
                 value={code}
