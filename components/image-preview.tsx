@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useRef, useEffect } from 'react'
+import { forwardRef, useRef, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Upload } from 'lucide-react'
 import { AnimationLayer } from '@/types/animation'
@@ -32,6 +32,8 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
     ref
   ) {
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [isDragging, setIsDragging] = useState(false)
+    const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
       const handleFrameProgress = (e: CustomEvent) => {
@@ -42,6 +44,9 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
       
       return () => {
         window.removeEventListener('animation-frame-progress', handleFrameProgress as EventListener)
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current)
+        }
       }
     }, [])
 
@@ -50,14 +55,72 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
       if (file && file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = (event) => {
-          onImageUpload(event.target?.result as string)
+          const result = event.target?.result as string
+          if (result) {
+            onImageUpload(result)
+          }
+        }
+        reader.onerror = () => {
+          console.error('Error reading file')
         }
         reader.readAsDataURL(file)
+        // Reset input so the same file can be selected again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
       }
     }
 
-    const handleUploadClick = () => {
-      fileInputRef.current?.click()
+    const handleUploadClick = (e?: React.MouseEvent) => {
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      
+      // Prevent double-clicks
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current)
+      }
+      
+      clickTimeoutRef.current = setTimeout(() => {
+        fileInputRef.current?.click()
+        clickTimeoutRef.current = null
+      }, 0)
+    }
+
+    const handleDragOver = (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragging(true)
+    }
+
+    const handleDragLeave = (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragging(false)
+    }
+
+    const handleDrop = (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragging(false)
+
+      const file = e.dataTransfer.files?.[0]
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          const result = event.target?.result as string
+          if (result) {
+            onImageUpload(result)
+          }
+        }
+        reader.onerror = () => {
+          console.error('Error reading file')
+        }
+        reader.readAsDataURL(file)
+      } else {
+        console.warn('Please drop an image file')
+      }
     }
 
     const animationStyles = uploadedImage && animationLayers.length > 0
@@ -94,21 +157,36 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           className={`flex ${uploadedImage ? 'items-start justify-center' : 'items-center justify-center'} min-h-[600px] rounded-xl`}
         >
           {!uploadedImage ? (
-            <div className="text-center">
+            <div className="text-center w-full">
               <div
-                className={`bg-white/80 backdrop-blur-sm border-2 border-dashed border-zinc-300 hover:border-zinc-400 transition-all p-16 cursor-pointer ${
+                className={`bg-white/80 backdrop-blur-sm border-2 border-dashed transition-all p-16 cursor-pointer ${
+                  isDragging 
+                    ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/10' 
+                    : 'border-zinc-300 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-600'
+                } ${
                   rounded ? 'rounded-3xl' : ''
                 }`}
-                onClick={handleUploadClick}
+                onClick={(e) => {
+                  // Only trigger if clicking directly on the div, not on the button or its children
+                  const target = e.target as HTMLElement
+                  const isButton = target.closest('button') || target.tagName === 'BUTTON'
+                  if (!isButton) {
+                    handleUploadClick(e)
+                  }
+                }}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
               >
-                <Upload className="h-16 w-16 mx-auto mb-4 text-zinc-400" />
-                <p className="text-lg font-semibold mb-2 text-zinc-900">Upload an image</p>
-                <p className="text-sm text-zinc-500 mb-6">
+                <Upload className={`h-16 w-16 mx-auto mb-4 ${isDragging ? 'text-purple-500' : 'text-zinc-400'}`} />
+                <p className="text-lg font-semibold mb-2 text-zinc-900 dark:text-zinc-100">
+                  {isDragging ? 'Drop image here' : 'Upload an image'}
+                </p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
                   Click to browse or drag and drop
                 </p>
                 <Button 
                   onClick={handleUploadClick}
-                  className="bg-zinc-900 hover:bg-zinc-800"
                 >
                   Choose File
                 </Button>

@@ -28,7 +28,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="container px-4 py-24 md:py-32">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-4xl text-center flex flex-col items-center justify-center min-h-[60vh]">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-1.5 text-sm">
             <Sparkles className="h-4 w-4" />
             <span>Turn your code into beautiful images</span>
@@ -42,7 +42,7 @@ export default function LandingPage() {
             </span>
           </h1>
 
-          <p className="mb-8 text-lg text-muted-foreground sm:text-xl">
+          <p className="mb-8 text-lg text-muted-foreground sm:text-xl max-w-2xl">
             A minimalist tool for turning your code, images, and websites into beautiful,
             shareable images. Perfect for documentation, social media, and presentations.
           </p>
