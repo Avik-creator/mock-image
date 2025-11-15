@@ -43,7 +43,7 @@ async function getChromiumPath(): Promise<string> {
 /**
  * Shared screenshot capture logic for both GET and POST requests
  */
-async function captureScreenshot(url: string) {
+async function captureScreenshot(url: string, darkMode: boolean = false) {
   let browser;
 
   try {
@@ -82,6 +82,13 @@ async function captureScreenshot(url: string) {
       height: 1080,
       deviceScaleFactor: 1,
     });
+
+    // Set dark mode preference if requested
+    if (darkMode) {
+      await page.emulateMediaFeatures([
+        { name: 'prefers-color-scheme', value: 'dark' }
+      ]);
+    }
 
     // Navigate to the page and wait for it to be fully loaded
     await page.goto(url, {
@@ -144,7 +151,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const screenshot = await captureScreenshot(parsedUrl.toString());
+    const darkModeParam = searchParams.get("darkMode");
+    const darkMode = darkModeParam === "true" || darkModeParam === "1";
+    
+    const screenshot = await captureScreenshot(parsedUrl.toString(), darkMode);
 
     // Return screenshot as PNG image
     return new NextResponse(screenshot as unknown as BodyInit, {
@@ -166,7 +176,7 @@ export async function GET(request: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { url } = body;
+    const { url, darkMode } = body;
 
     if (!url || typeof url !== "string") {
       return NextResponse.json(
@@ -190,7 +200,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const screenshot = await captureScreenshot(validUrl);
+    const useDarkMode = darkMode === true || darkMode === "true" || darkMode === 1;
+    const screenshot = await captureScreenshot(validUrl, useDarkMode);
 
     return new NextResponse(screenshot, {
       status: 200,

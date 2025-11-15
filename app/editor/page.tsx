@@ -14,6 +14,8 @@ import { exportAsVideo } from '@/lib/video-export'
 import { ModeToggle } from '@/components/mode-toggle'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 
 const defaultCode = `.container {
   display: flex;
@@ -49,6 +51,7 @@ export default function EditorPage() {
   const [url, setUrl] = useState('')
   const [urlImage, setUrlImage] = useState<string | null>(null)
   const [isLoadingUrl, setIsLoadingUrl] = useState(false)
+  const [urlDarkMode, setUrlDarkMode] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
   const [isExporting, setIsExporting] = useState(false)
@@ -181,7 +184,7 @@ export default function EditorPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: validUrl }),
+        body: JSON.stringify({ url: validUrl, darkMode: urlDarkMode }),
       })
 
       if (!response.ok) {
@@ -434,7 +437,7 @@ export default function EditorPage() {
 
           {/* URL Input for URL mode */}
           {playground === 'url' && (
-            <div className="p-4 border-b space-y-2">
+            <div className="p-4 border-b space-y-3">
               <Input
                 type="url"
                 placeholder="https://example.com"
@@ -447,6 +450,16 @@ export default function EditorPage() {
                 }}
                 className="w-full"
               />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="url-dark-mode" className="text-sm font-medium cursor-pointer">
+                  Dark Mode
+                </Label>
+                <Switch
+                  id="url-dark-mode"
+                  checked={urlDarkMode}
+                  onCheckedChange={setUrlDarkMode}
+                />
+              </div>
               <Button
                 onClick={handleCaptureUrl}
                 disabled={isLoadingUrl || !url.trim()}
