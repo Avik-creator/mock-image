@@ -147,11 +147,47 @@ No environment variables are required for basic functionality. However, for prod
 
 ### Vercel (Recommended)
 
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Vercel will automatically detect Next.js and configure build settings
+The project is fully configured for Vercel deployment with Puppeteer support using `@sparticuz/chromium`.
 
-**Note**: For Puppeteer on Vercel, you may need to use a serverless function with additional configuration or consider using an external screenshot service.
+#### Quick Deploy
+
+1. **Push your code to GitHub**
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
+
+2. **Deploy to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your GitHub repository
+   - Vercel will automatically detect Next.js
+   - Click "Deploy"
+
+3. **That's it!** Your app will be live in minutes.
+
+#### Configuration
+
+The project includes:
+- ✅ `vercel.json` - Configured for serverless functions with 30s timeout
+- ✅ `@sparticuz/chromium` - Vercel-compatible Chromium for Puppeteer
+- ✅ `puppeteer-core` - Lightweight Puppeteer without bundled Chromium
+- ✅ Next.js config optimized for Vercel
+
+#### Vercel-Specific Features
+
+- **Serverless Functions**: Screenshot API runs as a serverless function
+- **Automatic Scaling**: Handles traffic spikes automatically
+- **Edge Network**: Global CDN for fast content delivery
+- **Environment Variables**: Set via Vercel dashboard if needed
+
+#### Important Notes
+
+- The screenshot API has a 30-second timeout (configured in `vercel.json`)
+- First request may be slower due to cold start (~2-3 seconds)
+- Subsequent requests are much faster
+- Free tier includes 100GB bandwidth and 100 hours of serverless function execution
 
 ### Self-Hosted
 
