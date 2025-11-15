@@ -8,7 +8,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
         <div className="w-full flex items-center justify-center px-4">
           <div className="w-full max-w-7xl flex h-16 items-center justify-between">
             <div className="flex items-center gap-2 font-semibold text-lg">
@@ -135,8 +135,8 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t">
-        <div className="container px-4 py-12">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <div className="w-full flex items-center justify-center px-4 py-12">
+          <div className="w-full max-w-7xl flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2 font-semibold">
               <span>{'</>'}</span>
               <span>Snippet</span>
