@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Code, Image, Globe, Sparkles, ArrowRight, Moon, Sun } from 'lucide-react'
+import { ModeToggle } from '@/components/mode-toggle'
 
 export default function LandingPage() {
   return (
@@ -21,7 +22,11 @@ export default function LandingPage() {
                   Editor
                 </Button>
               </Link>
+              <div className="flex items-center gap-2">
+            <ModeToggle />
+          </div>
             </div>
+            
           </div>
         </div>
       </header>
