@@ -6,8 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Optimize for Vercel - external packages for server components
-  serverExternalPackages: ['@sparticuz/chromium', 'puppeteer-core'],
-}
+  // Prevent Next.js from bundling these packages (they contain native binaries)
+  serverExternalPackages: ["@sparticuz/chromium-min", "puppeteer-core"],
+};
 
-export default nextConfig
+export default nextConfig;
