@@ -418,115 +418,227 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
     else if (isResendTheme) borderColor = 'hsla(0, 0%, 24%, 0.13)'
     else if (isNuxtTheme) borderColor = 'transparent'
 
-    // Determine background style
-    const getBackgroundStyle = () => {
-      if (background === 'transparent') {
-        return { backgroundColor: 'transparent' }
-      } else if (background.startsWith('/')) {
-        // Image background
-        return {
-          backgroundImage: `url(${background})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+    // Determine frame background style based on theme
+    const getFrameBackgroundStyle = () => {
+      // Check if user has selected a custom background (not the default)
+      const hasCustomBackground = background !== 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)'
+      
+      // If user selected a custom background (gradient, image, or solid color), use it
+      if (hasCustomBackground) {
+        if (background === 'transparent') {
+          return { backgroundColor: 'transparent' }
+        } else if (background.startsWith('/')) {
+          return {
+            backgroundImage: `url(${background})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }
+        } else if (background.startsWith('linear-gradient') || background.startsWith('radial-gradient')) {
+          return { backgroundImage: background }
+        } else {
+          return { backgroundColor: background }
         }
-      } else if (background.startsWith('linear-gradient') || background.startsWith('radial-gradient')) {
-        // Gradient background
-        return { backgroundImage: background }
-      } else {
-        // Solid color background
-        return { backgroundColor: background }
       }
+      
+      // Theme-specific frame backgrounds (only when using default background)
+      if (isVercelTheme) return { backgroundColor: '#000000' }
+      if (isSupabaseTheme) return { backgroundColor: '#121212' }
+      if (isTailwindTheme) return { backgroundColor: '#0f172a' }
+      if (isTriggerTheme) return { backgroundColor: '#121317' }
+      if (isClerkTheme) return { backgroundColor: '#222222' }
+      if (isMintlifyTheme) return { backgroundColor: '#121212' }
+      if (isPrismaTheme) return { background: 'linear-gradient(140deg, #0c1d26 0%, #0a0c17 100%)' }
+      if (isOpenAITheme) return { backgroundColor: '#121a29' }
+      if (isElevenLabsTheme) return { backgroundColor: '#111' }
+      if (isResendTheme) return { backgroundColor: '#000000' }
+      if (isNuxtTheme) return { backgroundColor: '#0b0c11' }
+      
+      // Default fallback
+      return { backgroundImage: background }
     }
+
+    // Check if we should show transparent pattern overlay
+    const showTransparentPattern = background === 'transparent' && !isVercelTheme && !isSupabaseTheme && !isTailwindTheme && !isTriggerTheme && !isClerkTheme && !isMintlifyTheme && !isPrismaTheme && !isOpenAITheme && !isElevenLabsTheme && !isResendTheme && !isNuxtTheme
 
     return (
       <div
         ref={ref}
         style={{
-          ...getBackgroundStyle(),
+          ...getFrameBackgroundStyle(),
           padding: `${padding}px`,
+          position: 'relative',
         }}
         className="inline-block"
       >
+        {/* Transparent pattern overlay */}
+        {showTransparentPattern && (
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              backgroundImage: 'linear-gradient(45deg, #1d1d1d 25%, transparent 0), linear-gradient(-45deg, #1d1d1d 25%, transparent 0), linear-gradient(45deg, transparent 75%, #1d1d1d 0), linear-gradient(-45deg, transparent 75%, #1d1d1d 0)',
+              backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0',
+              backgroundSize: '20px 20px',
+            }}
+          />
+        )}
         <div
-          className="shadow-2xl overflow-hidden relative"
+          className="overflow-hidden relative"
           style={{ 
             minWidth: '500px',
             backgroundColor: windowBg,
             borderRadius: rounded ? '0.75rem' : '0',
+            boxShadow: isVercelTheme || isSupabaseTheme || isTailwindTheme || isTriggerTheme || isClerkTheme || isMintlifyTheme || isPrismaTheme || isOpenAITheme || isElevenLabsTheme || isResendTheme || isNuxtTheme
+              ? 'none'
+              : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: isSupabaseTheme ? '1px solid #292929' :
+                    isTailwindTheme ? '1px solid rgba(255, 255, 255, 0.1)' :
+                    isTriggerTheme ? 'none' :
+                    isClerkTheme ? 'none' :
+                    isMintlifyTheme ? 'none' :
+                    isPrismaTheme ? '1px solid transparent' :
+                    isOpenAITheme ? '0.5px solid rgba(255, 255, 255, 0.1)' :
+                    isElevenLabsTheme ? '1px solid #353535' :
+                    isResendTheme ? '0.5px solid hsla(0, 0%, 24%, 0.13)' :
+                    isNuxtTheme ? '1px solid transparent' :
+                    'none',
+            position: 'relative',
+            zIndex: 1,
           }}
         >
-          {/* Theme-specific decorations */}
-          {(isVercelTheme || isNuxtTheme || isElevenLabsTheme) && (
+          {/* Theme-specific decorations - Gridlines */}
+          {(isVercelTheme || isTailwindTheme || isTriggerTheme || isElevenLabsTheme || isNuxtTheme) && (
             <>
+              {/* Horizontal gridlines */}
               <span 
-                className="absolute top-0 bottom-0 left-[-150px] w-[1200px] h-px pointer-events-none"
+                className="absolute top-0 bottom-0 left-[-150px] w-[1200px] h-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : (isNuxtTheme ? 'transparent' : '#353535'),
+                  background: isVercelTheme ? '#1a1a1a' : 
+                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
+                              isTriggerTheme ? '#272a2e' :
+                              isElevenLabsTheme ? '#353535' :
+                              isNuxtTheme ? 'transparent' : '#1a1a1a',
                   top: 0,
                 }}
               />
               <span 
-                className="absolute top-0 bottom-0 left-[-150px] w-[1200px] h-px pointer-events-none"
+                className="absolute top-0 bottom-0 left-[-150px] w-[1200px] h-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : (isNuxtTheme ? 'transparent' : '#353535'),
+                  background: isVercelTheme ? '#1a1a1a' : 
+                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
+                              isTriggerTheme ? '#272a2e' :
+                              isElevenLabsTheme ? '#353535' :
+                              isNuxtTheme ? 'transparent' : '#1a1a1a',
                   bottom: 0,
                   top: 'auto',
                 }}
               />
+              {/* Vertical gridlines */}
               <span 
-                className="absolute top-[-150px] bottom-0 left-0 w-px pointer-events-none"
+                className="absolute top-[-150px] bottom-0 left-0 w-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : (isNuxtTheme ? 'transparent' : '#353535'),
+                  background: isVercelTheme ? '#1a1a1a' : 
+                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
+                              isTriggerTheme ? '#272a2e' :
+                              isElevenLabsTheme ? '#353535' :
+                              isNuxtTheme ? 'transparent' : '#1a1a1a',
                   height: 'calc(100% + 300px)',
                 }}
               />
               <span 
-                className="absolute top-[-150px] bottom-0 right-0 w-px pointer-events-none"
+                className="absolute top-[-150px] bottom-0 right-0 w-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : (isNuxtTheme ? 'transparent' : '#353535'),
+                  background: isVercelTheme ? '#1a1a1a' : 
+                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
+                              isTriggerTheme ? '#272a2e' :
+                              isElevenLabsTheme ? '#353535' :
+                              isNuxtTheme ? 'transparent' : '#1a1a1a',
                   height: 'calc(100% + 300px)',
                 }}
               />
-              {/* Vercel Brackets */}
-              {isVercelTheme && (
-                <>
-                  <span 
-                    className="absolute top-[-12px] left-[-12px] w-[25px] h-[25px] pointer-events-none"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <span 
-                      className="absolute top-[12px] w-full h-px"
-                      style={{ background: '#515356' }}
-                    />
-                    <span 
-                      className="absolute left-[12px] w-px h-full"
-                      style={{ background: '#515356' }}
-                    />
-                  </span>
-                  <span 
-                    className="absolute bottom-[-12px] right-[-12px] w-[25px] h-[25px] pointer-events-none"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <span 
-                      className="absolute top-[12px] w-full h-px"
-                      style={{ background: '#515356' }}
-                    />
-                    <span 
-                      className="absolute left-[12px] w-px h-full"
-                      style={{ background: '#515356' }}
-                    />
-                  </span>
-                </>
-              )}
+            </>
+          )}
+          
+          {/* Vercel Corner Brackets */}
+          {isVercelTheme && (
+            <>
+              <span 
+                className="absolute top-[-12px] left-[-12px] w-[25px] h-[25px] pointer-events-none z-10"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span 
+                  className="absolute top-[12px] w-full h-px"
+                  style={{ background: '#515356' }}
+                />
+                <span 
+                  className="absolute left-[12px] w-px h-full"
+                  style={{ background: '#515356' }}
+                />
+              </span>
+              <span 
+                className="absolute bottom-[-12px] right-[-12px] w-[25px] h-[25px] pointer-events-none z-10"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span 
+                  className="absolute top-[12px] w-full h-px"
+                  style={{ background: '#515356' }}
+                />
+                <span 
+                  className="absolute left-[12px] w-px h-full"
+                  style={{ background: '#515356' }}
+                />
+              </span>
+            </>
+          )}
+          
+          {/* Prisma Gradient Borders */}
+          {isPrismaTheme && (
+            <>
+              <span 
+                className="absolute inset-[-1px] rounded-[10px] pointer-events-none z-0"
+                style={{
+                  background: 'linear-gradient(140deg, #3e4083, #16544f)',
+                  WebkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                  mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                }}
+              />
+              <span 
+                className="absolute inset-[-6px] rounded-[16px] pointer-events-none z-0"
+                style={{
+                  background: 'linear-gradient(140deg, #3e4083, #16544f)',
+                  opacity: 0.5,
+                  WebkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                  mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                }}
+              />
+            </>
+          )}
+          
+          {/* Nuxt Gradient Borders */}
+          {isNuxtTheme && (
+            <>
+              <span 
+                className="absolute inset-[-1px] rounded-[10px] pointer-events-none z-0"
+                style={{
+                  background: 'linear-gradient(135deg, #00dc82 0%, #00dc82 8%, transparent 20%, transparent 80%, #00dc82 92%, #00dc82 100%)',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
+                }}
+              />
             </>
           )}
           {showWindowControls && (
