@@ -314,16 +314,6 @@ export default function EditorPage() {
     }
 
     try {
-      // Check if clipboard API is available
-      if (!navigator.clipboard || !window.ClipboardItem) {
-        toast({
-          title: 'Error',
-          description: 'Clipboard API not supported in this browser',
-          variant: 'destructive',
-        })
-        return
-      }
-
       const html2canvas = (await import('html2canvas-pro')).default
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: null,
@@ -342,20 +332,73 @@ export default function EditorPage() {
           return
         }
 
-        try {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ])
+        // Check for Safari and modern clipboard API
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+        const hasClipboardAPI = navigator.clipboard && window.ClipboardItem
+
+        if (hasClipboardAPI) {
+          try {
+            // Request clipboard permission explicitly for Safari
+            if (isSafari && navigator.permissions) {
+              try {
+                const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName })
+                if (permission.state === 'denied') {
+                  throw new Error('Clipboard permission denied')
+                }
+              } catch (permError) {
+                // Permission query might not be supported, continue anyway
+                console.log('Permission query not available, attempting clipboard write')
+              }
+            }
+
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ])
+            toast({
+              title: 'Success',
+              description: 'Image copied to clipboard!',
+            })
+          } catch (clipboardError: any) {
+            console.error('Clipboard write error:', clipboardError)
+
+            // Fallback for Safari or permission issues
+            if (isSafari || clipboardError.name === 'NotAllowedError' || clipboardError.name === 'SecurityError') {
+              // Fallback: Create a temporary download link
+              const url = URL.createObjectURL(blob)
+              const link = document.createElement('a')
+              link.href = url
+              link.download = `snippet-${Date.now()}.png`
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+              URL.revokeObjectURL(url)
+
+              toast({
+                title: 'Info',
+                description: 'Clipboard access denied. Image downloaded instead. Please enable clipboard permissions in Safari settings.',
+              })
+            } else {
+              toast({
+                title: 'Error',
+                description: 'Failed to copy to clipboard. Please try again.',
+                variant: 'destructive',
+              })
+            }
+          }
+        } else {
+          // Fallback for browsers without ClipboardItem support
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `snippet-${Date.now()}.png`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+
           toast({
-            title: 'Success',
-            description: 'Image copied to clipboard!',
-          })
-        } catch (clipboardError) {
-          console.error('Clipboard write error:', clipboardError)
-          toast({
-            title: 'Error',
-            description: 'Failed to copy to clipboard. Please try again.',
-            variant: 'destructive',
+            title: 'Info',
+            description: 'Clipboard API not supported. Image downloaded instead.',
           })
         }
       }, 'image/png')
