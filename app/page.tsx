@@ -2,39 +2,39 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ModeToggle } from '@/components/mode-toggle'
-import { Code, Image, Globe, Download, Sparkles, ArrowRight } from 'lucide-react'
+import { Code, Image, Globe, Sparkles, ArrowRight, Moon, Sun } from 'lucide-react'
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2 font-semibold text-lg">
-            <span>{'</>'}</span>
-            <span>Snippet</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/editor">
-              <Button variant="ghost" size="sm">
-                Editor
-              </Button>
-            </Link>
-            <ModeToggle />
+        <div className="w-full flex items-center justify-center px-4">
+          <div className="w-full max-w-7xl flex h-16 items-center justify-between">
+            <div className="flex items-center gap-2 font-semibold text-lg">
+              <span>{'</>'}</span>
+              <span>Snippet</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link href="/editor">
+                <Button variant="ghost" size="sm">
+                  Editor
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container px-4 py-24 md:py-32">
-        <div className="mx-auto max-w-4xl text-center flex flex-col items-center justify-center min-h-[60vh]">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-1.5 text-sm">
+      <section className="w-full flex items-center justify-center px-4 py-12 md:py-24">
+        <div className="w-full max-w-4xl text-center flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-1.5 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
             <span>Turn your code into beautiful images</span>
           </div>
 
-          <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="mb-8 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
             Create stunning code
             <br />
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -42,33 +42,38 @@ export default function LandingPage() {
             </span>
           </h1>
 
-          <p className="mb-8 text-lg text-muted-foreground sm:text-xl max-w-2xl">
+          <p className="mb-10 text-lg text-muted-foreground sm:text-xl max-w-2xl mx-auto leading-relaxed">
             A minimalist tool for turning your code, images, and websites into beautiful,
             shareable images. Perfect for documentation, social media, and presentations.
           </p>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Link href="/editor">
-              <Button size="lg" className="w-full sm:w-auto">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center items-center">
+            <Link href="/editor" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow">
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
-              <a href="#features">Learn More</a>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto border-2 hover:bg-accent/50 transition-colors"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Learn More
             </Button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="container px-4 py-24">
-        <div className="mx-auto max-w-5xl">
+      <section id="features" className="w-full flex items-center justify-center px-4 py-20 md:py-32">
+        <div className="w-full max-w-5xl">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
               Everything you need
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Powerful features in a simple, elegant interface
             </p>
           </div>
@@ -111,8 +116,8 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="container px-4 py-24">
-        <div className="mx-auto max-w-3xl rounded-2xl border bg-card p-12 text-center">
+      <section className="w-full flex items-center justify-center px-4 py-20 md:py-32">
+        <div className="w-full max-w-3xl rounded-2xl border bg-card p-8 md:p-12 text-center shadow-lg">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
             Ready to create?
           </h2>
@@ -120,7 +125,7 @@ export default function LandingPage() {
             Start creating beautiful screenshots in seconds. No sign-up required.
           </p>
           <Link href="/editor">
-            <Button size="lg">
+            <Button size="lg" className="shadow-lg hover:shadow-xl transition-shadow">
               Open Editor
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
