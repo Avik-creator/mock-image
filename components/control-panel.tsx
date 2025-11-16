@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Upload, X, Check } from 'lucide-react'
 import { useRef } from 'react'
 import * as React from 'react'
@@ -371,9 +371,9 @@ export function ControlPanel({
   onImageInsert,
 }: ControlPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [themePopoverOpen, setThemePopoverOpen] = React.useState(false)
-  const [languagePopoverOpen, setLanguagePopoverOpen] = React.useState(false)
-  const [backgroundPopoverOpen, setBackgroundPopoverOpen] = React.useState(false)
+  const [themeDialogOpen, setThemeDialogOpen] = React.useState(false)
+  const [languageDialogOpen, setLanguageDialogOpen] = React.useState(false)
+  const [backgroundDialogOpen, setBackgroundDialogOpen] = React.useState(false)
   return (
     <div className="space-y-6">
       {playground === 'code' && (
@@ -381,21 +381,21 @@ export function ControlPanel({
           {/* Language */}
           <div className="space-y-2">
             <Label className="text-xs font-medium text-muted-foreground">Language</Label>
-            <Popover open={languagePopoverOpen} onOpenChange={setLanguagePopoverOpen}>
-              <PopoverTrigger asChild>
+            <Dialog open={languageDialogOpen} onOpenChange={setLanguageDialogOpen}>
+              <DialogTrigger asChild>
                 <Button
                   variant="outline"
                   className="w-full justify-between h-9 text-sm font-normal"
                 >
                   <span>{languages.find(l => l.value === language)?.label || 'Select language'}</span>
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[600px] md:w-[700px] lg:w-[800px] p-0 max-h-[85vh] flex flex-col" align="start">
-                <div className="p-3 sm:p-4 border-b bg-muted/30 flex-shrink-0">
-                  <div className="text-sm font-semibold">Programming Languages</div>
-                  <div className="text-xs text-muted-foreground">Choose your language</div>
-                </div>
-                <div className="p-3 sm:p-4 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
+              </DialogTrigger>
+              <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[800px] lg:max-w-[900px] max-h-[90vh] sm:max-h-[85vh] p-0 flex flex-col overflow-hidden">
+                <DialogHeader className="p-4 sm:p-6 border-b bg-muted/30 flex-shrink-0">
+                  <DialogTitle>Programming Languages</DialogTitle>
+                  <p className="text-xs text-muted-foreground mt-1">Choose your language</p>
+                </DialogHeader>
+                <div className="p-4 sm:p-6 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                     {languages.map((lang) => {
                       const sampleCode = getLanguageSampleCode(lang.value)
@@ -404,7 +404,7 @@ export function ControlPanel({
                           key={lang.value}
                           onClick={() => {
                             onLanguageChange(lang.value)
-                            setLanguagePopoverOpen(false)
+                            setLanguageDialogOpen(false)
                           }}
                           className={`group relative flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-lg border transition-all ${language === lang.value
                             ? 'bg-primary/10 border-primary shadow-sm'
@@ -438,26 +438,30 @@ export function ControlPanel({
                     })}
                   </div>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Theme */}
           <div className="space-y-2">
             <Label className="text-xs font-medium text-muted-foreground">Theme</Label>
-            <Popover open={themePopoverOpen} onOpenChange={setThemePopoverOpen}>
-              <PopoverTrigger asChild>
+            <Dialog open={themeDialogOpen} onOpenChange={setThemeDialogOpen}>
+              <DialogTrigger asChild>
                 <Button
                   variant="outline"
                   className="w-full justify-between h-9 text-sm font-normal"
                 >
                   <span>{themes.find(t => t.value === theme)?.label || 'Select theme'}</span>
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[600px] md:w-[700px] lg:w-[800px] p-0 max-h-[85vh] flex flex-col" align="start">
+              </DialogTrigger>
+              <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[800px] lg:max-w-[900px] max-h-[90vh] sm:max-h-[85vh] p-0 flex flex-col overflow-hidden">
+                <DialogHeader className="p-4 sm:p-6 border-b bg-muted/30 flex-shrink-0">
+                  <DialogTitle>Themes</DialogTitle>
+                  <p className="text-xs text-muted-foreground mt-1">Choose a syntax highlighting theme</p>
+                </DialogHeader>
                 <div className="overflow-y-auto flex-1">
                   {/* Light Themes Section */}
-                  <div className="p-3 sm:p-4 border-b bg-muted/30 flex-shrink-0">
+                  <div className="p-4 sm:p-6 border-b bg-muted/30 flex-shrink-0">
                     <div className="flex items-center justify-between mb-1">
                       <div>
                         <div className="text-sm font-semibold">Light Themes</div>
@@ -465,7 +469,7 @@ export function ControlPanel({
                       </div>
                     </div>
                   </div>
-                  <div className="p-3 sm:p-4 border-b flex-shrink-0">
+                  <div className="p-4 sm:p-6 border-b flex-shrink-0">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {themes.filter(t => t.category === 'light').map((t) => {
                         const themeColors = getThemePreviewColors(t.value)
@@ -474,7 +478,7 @@ export function ControlPanel({
                             key={t.value}
                             onClick={() => {
                               onThemeChange(t.value)
-                              setThemePopoverOpen(false)
+                              setThemeDialogOpen(false)
                             }}
                             className={`group relative flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-lg border transition-all ${theme === t.value
                               ? 'bg-primary/10 border-primary shadow-sm'
@@ -517,7 +521,7 @@ export function ControlPanel({
                   </div>
 
                   {/* Tech Themes Section */}
-                  <div className="p-3 sm:p-4 bg-muted/30 flex-shrink-0 border-b">
+                  <div className="p-4 sm:p-6 bg-muted/30 flex-shrink-0 border-b">
                     <div className="flex items-center justify-between mb-1">
                       <div>
                         <div className="text-sm font-semibold">Tech Themes</div>
@@ -525,7 +529,7 @@ export function ControlPanel({
                       </div>
                     </div>
                   </div>
-                  <div className="p-3 sm:p-4 border-b flex-shrink-0">
+                  <div className="p-4 sm:p-6 border-b flex-shrink-0">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {themes.filter(t => t.category === 'tech').map((t) => {
                         const themeColors = getThemePreviewColors(t.value)
@@ -534,7 +538,7 @@ export function ControlPanel({
                             key={t.value}
                             onClick={() => {
                               onThemeChange(t.value)
-                              setThemePopoverOpen(false)
+                              setThemeDialogOpen(false)
                             }}
                             className={`group relative flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-lg border transition-all ${theme === t.value
                               ? 'bg-primary/10 border-primary shadow-sm'
@@ -577,7 +581,7 @@ export function ControlPanel({
                   </div>
 
                   {/* Dark Themes Section */}
-                  <div className="p-3 sm:p-4 bg-muted/30 flex-shrink-0 border-b">
+                  <div className="p-4 sm:p-6 bg-muted/30 flex-shrink-0 border-b">
                     <div className="flex items-center justify-between mb-1">
                       <div>
                         <div className="text-sm font-semibold">Dark Themes</div>
@@ -585,7 +589,7 @@ export function ControlPanel({
                       </div>
                     </div>
                   </div>
-                  <div className="p-3 sm:p-4 flex-shrink-0">
+                  <div className="p-4 sm:p-6 flex-shrink-0">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {themes.filter(t => t.category === 'dark').map((t) => {
                         const themeColors = getThemePreviewColors(t.value)
@@ -594,7 +598,7 @@ export function ControlPanel({
                             key={t.value}
                             onClick={() => {
                               onThemeChange(t.value)
-                              setThemePopoverOpen(false)
+                              setThemeDialogOpen(false)
                             }}
                             className={`group relative flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-lg border transition-all ${theme === t.value
                               ? 'bg-primary/10 border-primary shadow-sm'
@@ -636,8 +640,8 @@ export function ControlPanel({
                     </div>
                   </div>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </DialogContent>
+            </Dialog>
           </div>
         </>
       )}
@@ -645,8 +649,8 @@ export function ControlPanel({
       {/* Background */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-muted-foreground">Background</Label>
-        <Popover open={backgroundPopoverOpen} onOpenChange={setBackgroundPopoverOpen}>
-          <PopoverTrigger asChild>
+        <Dialog open={backgroundDialogOpen} onOpenChange={setBackgroundDialogOpen}>
+          <DialogTrigger asChild>
             <Button
               variant="outline"
               className="w-full justify-between h-9 text-sm font-normal"
@@ -698,20 +702,20 @@ export function ControlPanel({
                 })()}
               </div>
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[600px] md:w-[700px] lg:w-[800px] p-0 max-h-[85vh] flex flex-col" align="start">
-            <div className="p-3 sm:p-4 border-b bg-muted/30 flex-shrink-0">
-              <div className="text-sm font-semibold">Backgrounds</div>
-              <div className="text-xs text-muted-foreground">Choose a background style</div>
-            </div>
-            <div className="p-3 sm:p-4 overflow-y-auto flex-1 min-h-0">
+          </DialogTrigger>
+          <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[800px] lg:max-w-[900px] max-h-[90vh] p-0 flex flex-col">
+            <DialogHeader className="p-4 sm:p-6 border-b bg-muted/30 flex-shrink-0">
+              <DialogTitle>Backgrounds</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-1">Choose a background style</p>
+            </DialogHeader>
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-2.5">
                 {backgrounds.map((bg) => (
                   <button
                     key={bg.value}
                     onClick={() => {
                       onBackgroundChange(bg.value)
-                      setBackgroundPopoverOpen(false)
+                      setBackgroundDialogOpen(false)
                     }}
                     className={`group relative flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-lg border transition-all ${background === bg.value
                       ? 'bg-primary/10 border-primary shadow-sm'
@@ -757,8 +761,8 @@ export function ControlPanel({
                 ))}
               </div>
             </div>
-          </PopoverContent>
-        </Popover>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Padding */}
