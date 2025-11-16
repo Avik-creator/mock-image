@@ -2,6 +2,20 @@
 
 import { forwardRef } from 'react'
 import { Highlight, themes } from 'prism-react-renderer'
+import { getTheme } from '@/lib/themes/theme-registry'
+import {
+  isLightTheme,
+  isTechTheme,
+  getWindowBackground,
+  getControlsBackground,
+  getBorderColor,
+  getFrameBackgroundStyle,
+  getWindowTitleColor,
+  getLineNumberColor,
+  getGridlineColor,
+  shouldShowGridlines,
+  shouldShowTransparentPattern,
+} from '@/lib/themes/theme-utils'
 
 interface PreviewWindowProps {
   code: string
@@ -18,454 +32,46 @@ interface PreviewWindowProps {
   onImageInsert?: (image: string | null) => void
 }
 
-// Helper function to create theme with common structure
-const createTheme = (bg: string, fg: string, colors: {
-  comment?: string
-  keyword?: string
-  string?: string
-  function?: string
-  variable?: string
-  constant?: string
-  type?: string
-  punctuation?: string
-}) => ({
-  plain: {
-    color: fg,
-    backgroundColor: bg,
-  },
-  styles: [
-    {
-      types: ['comment', 'punctuation.definition.comment'],
-      style: { color: colors.comment || '#6a737d' },
-    },
-    {
-      types: ['keyword', 'storage.modifier', 'storage.type', 'keyword.control', 'keyword.operator'],
-      style: { color: colors.keyword || '#d73a49' },
-    },
-    {
-      types: ['string', 'string.quoted', 'punctuation.definition.string.begin', 'punctuation.definition.string.end', 'string.regexp', 'string.interpolated'],
-      style: { color: colors.string || '#032f62' },
-    },
-    {
-      types: ['entity.name.function', 'support.function', 'meta.function-call'],
-      style: { color: colors.function || '#6f42c1' },
-    },
-    {
-      types: ['variable.other.readwrite', 'variable.other.readwrite.alias', 'variable.parameter', 'variable.other.property', 'support.variable.property'],
-      style: { color: colors.variable || fg },
-    },
-    {
-      types: ['constant.language', 'constant.numeric', 'constant.numeric.decimal'],
-      style: { color: colors.constant || '#005cc5' },
-    },
-    {
-      types: ['support.type.primitive', 'support.type', 'entity.name.type'],
-      style: { color: colors.type || '#005cc5' },
-    },
-    {
-      types: ['punctuation', 'meta.brace'],
-      style: { color: colors.punctuation || fg },
-    },
-  ],
-})
-
-// Vercel Theme Configuration
-const vercelTheme = {
-  plain: {
-    color: '#eeeeee',
-    backgroundColor: '#000000',
-  },
-  styles: [
-    {
-      types: ['comment', 'punctuation.definition.comment'],
-      style: {
-        color: '#a0a0a0',
-      },
-    },
-    {
-      types: ['keyword', 'storage.modifier', 'storage.type', 'keyword.control', 'keyword.operator'],
-      style: {
-        color: '#ff4d8d',
-      },
-    },
-    {
-      types: ['string', 'string.quoted', 'punctuation.definition.string.begin', 'punctuation.definition.string.end', 'string.regexp', 'string.interpolated'],
-      style: {
-        color: '#00cb50',
-      },
-    },
-    {
-      types: ['constant.character', 'variable.language.this'],
-      style: {
-        color: '#A6B5FF',
-      },
-    },
-    {
-      types: ['constant.language', 'constant.numeric', 'constant.numeric.decimal'],
-      style: {
-        color: '#ffffff',
-      },
-    },
-    {
-      types: ['variable.other.constant'],
-      style: {
-        color: '#47a8ff',
-      },
-    },
-    {
-      types: ['variable.other.readwrite', 'variable.other.readwrite.alias', 'variable.parameter', 'variable.other.property', 'support.variable.property'],
-      style: {
-        color: '#eeeeee',
-      },
-    },
-    {
-      types: ['variable.other.object'],
-      style: {
-        color: '#47a8ff',
-      },
-    },
-    {
-      types: ['entity.name.function', 'support.function', 'meta.function-call'],
-      style: {
-        color: '#c473fc',
-      },
-    },
-    {
-      types: ['entity.name.tag'],
-      style: {
-        color: '#00cb50',
-      },
-    },
-    {
-      types: ['support.class.component'],
-      style: {
-        color: '#47a8ff',
-      },
-    },
-    {
-      types: ['entity.other.attribute-name'],
-      style: {
-        color: '#c473fc',
-      },
-    },
-    {
-      types: ['punctuation', 'meta.brace', 'punctuation.definition.tag.begin', 'punctuation.definition.tag.end', 'punctuation.definition.tag'],
-      style: {
-        color: '#eeeeee',
-      },
-    },
-    {
-      types: ['support.type.primitive', 'support.type'],
-      style: {
-        color: '#47a8ff',
-      },
-    },
-    {
-      types: ['entity.name.type.tsx', 'meta.type.annotation.tsx', 'meta.var-single-variable.expr.tsx', 'entity.name'],
-      style: {
-        color: '#C473FC',
-      },
-    },
-    {
-      types: ['markup.underline.link', 'string.other.link'],
-      style: {
-        color: '#00cb50',
-      },
-    },
-    {
-      types: ['markup.bold'],
-      style: {
-        color: '#ff4d8d',
-        fontWeight: 'bold',
-      },
-    },
-    {
-      types: ['markup.italic'],
-      style: {
-        fontStyle: 'italic',
-      },
-    },
-    {
-      types: ['markup.heading', 'entity.name.section'],
-      style: {
-        color: '#c473fc',
-        fontWeight: 'bold',
-      },
-    },
-    {
-      types: ['invalid', 'invalid.illegal'],
-      style: {
-        color: '#ff0000',
-      },
-    },
-  ],
-}
-
-// Supabase Theme
-const supabaseTheme = createTheme('#171717', '#fafafa', {
-  comment: '#898989',
-  keyword: '#ff6b6b',
-  string: '#51cf66',
-  function: '#74c0fc',
-  variable: '#fafafa',
-  constant: '#ffd43b',
-  type: '#74c0fc',
-  punctuation: '#fafafa',
-})
-
-// Tailwind Theme
-const tailwindTheme = createTheme('#1e293b', '#e2e8f0', {
-  comment: '#64748b',
-  keyword: '#f472b6',
-  string: '#34d399',
-  function: '#818cf8',
-  variable: '#e2e8f0',
-  constant: '#fbbf24',
-  type: '#60a5fa',
-  punctuation: '#e2e8f0',
-})
-
-// Trigger.dev Theme
-const triggerTheme = createTheme('#121317', '#b5b8c0', {
-  comment: '#5f6570',
-  keyword: '#ff6b9d',
-  string: '#4ade80',
-  function: '#a78bfa',
-  variable: '#b5b8c0',
-  constant: '#fbbf24',
-  type: '#60a5fa',
-  punctuation: '#b5b8c0',
-})
-
-// Clerk Theme
-const clerkTheme = createTheme('#191919', '#ffffff', {
-  comment: '#666666',
-  keyword: '#ff6b6b',
-  string: '#51cf66',
-  function: '#74c0fc',
-  variable: '#ffffff',
-  constant: '#ffd43b',
-  type: '#74c0fc',
-  punctuation: '#ffffff',
-})
-
-// Mintlify Theme
-const mintlifyTheme = createTheme('#070a08', '#55d799', {
-  comment: '#4a5568',
-  keyword: '#ff6b9d',
-  string: '#55d799',
-  function: '#a78bfa',
-  variable: '#55d799',
-  constant: '#fbbf24',
-  type: '#60a5fa',
-  punctuation: '#55d799',
-})
-
-// Prisma Theme
-const prismaTheme = createTheme('hsla(223, 41%, 7%, 75%)', '#e2e8f0', {
-  comment: '#64748b',
-  keyword: '#f472b6',
-  string: '#34d399',
-  function: '#818cf8',
-  variable: '#e2e8f0',
-  constant: '#fbbf24',
-  type: '#60a5fa',
-  punctuation: '#e2e8f0',
-})
-
-// OpenAI Theme
-const openaiTheme = createTheme('#232b41', '#ffffff', {
-  comment: 'rgba(255, 255, 255, 0.2)',
-  keyword: '#ff6b9d',
-  string: '#4ade80',
-  function: '#a78bfa',
-  variable: '#ffffff',
-  constant: '#fbbf24',
-  type: '#60a5fa',
-  punctuation: '#ffffff',
-})
-
-// ElevenLabs Theme
-const elevenLabsTheme = createTheme('#111', '#ffffff', {
-  comment: '#666666',
-  keyword: '#ff6b6b',
-  string: '#51cf66',
-  function: '#74c0fc',
-  variable: '#ffffff',
-  constant: '#ffd43b',
-  type: '#74c0fc',
-  punctuation: '#ffffff',
-})
-
-// Resend Theme (Dark)
-const resendTheme = createTheme('hsla(0, 0%, 0%, 0.88)', 'hsl(0, 0%, 98%)', {
-  comment: '#666666',
-  keyword: '#00fff6',
-  string: '#67ffde',
-  function: '#00fff6',
-  variable: 'hsl(0, 0%, 98%)',
-  constant: '#ffd43b',
-  type: '#00fff6',
-  punctuation: 'hsl(0, 0%, 98%)',
-})
-
-// Nuxt Theme
-const nuxtTheme = createTheme('#0b0c11', '#ffffff', {
-  comment: '#8b949e',
-  keyword: '#00dc82',
-  string: '#00dc82',
-  function: '#00dc82',
-  variable: '#ffffff',
-  constant: '#ffd43b',
-  type: '#00dc82',
-  punctuation: '#ffffff',
-})
-
-const themeMap: Record<string, any> = {
-  monokai: themes.vsDark, // Monokai-like dark theme
-  github: themes.github,
-  dracula: themes.dracula,
-  nightOwl: themes.nightOwl,
-  oceanicNext: themes.oceanicNext,
-  atomDark: themes.oneDark,
-  synthwave: themes.synthwave84,
-  vsDark: themes.vsDark,
-  vsLight: themes.vsLight,
-  duotoneLight: themes.duotoneLight,
-  duotoneDark: themes.duotoneDark,
-  shadesOfPurple: themes.shadesOfPurple,
-  palenight: themes.palenight,
-  materialDark: themes.materialDark,
-  materialLight: themes.materialLight,
-  materialOceanic: themes.materialOceanic,
-  nord: themes.nord,
-  oneLight: themes.oneLight,
-  pojoaque: themes.pojoaque,
-  vscDarkPlus: themes.vscDarkPlus,
-  zTouch: themes.zTouch,
-  vercel: vercelTheme,
-  supabase: supabaseTheme,
-  tailwind: tailwindTheme,
-  trigger: triggerTheme,
-  clerk: clerkTheme,
-  mintlify: mintlifyTheme,
-  prisma: prismaTheme,
-  openai: openaiTheme,
-  elevenlabs: elevenLabsTheme,
-  resend: resendTheme,
-  nuxt: nuxtTheme,
-}
-
 export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
   function PreviewWindow(
     { code, language, theme, background, padding, rounded, showLineNumbers, showWindowControls, windowTitle, insertedImage, onChange, onImageInsert },
     ref
   ) {
-    const selectedTheme = themeMap[theme] || themes.vsDark
+    const selectedTheme = getTheme(theme)
     const themeBg = selectedTheme.plain?.backgroundColor || '#1e1e1e'
-    const isLightTheme = theme === 'vsLight' || theme === 'duotoneLight' || theme === 'materialLight' || theme === 'oneLight'
-    const isVercelTheme = theme === 'vercel'
-    const isSupabaseTheme = theme === 'supabase'
-    const isTailwindTheme = theme === 'tailwind'
-    const isTriggerTheme = theme === 'trigger'
-    const isClerkTheme = theme === 'clerk'
-    const isMintlifyTheme = theme === 'mintlify'
-    const isPrismaTheme = theme === 'prisma'
-    const isOpenAITheme = theme === 'openai'
-    const isElevenLabsTheme = theme === 'elevenlabs'
-    const isResendTheme = theme === 'resend'
-    const isNuxtTheme = theme === 'nuxt'
+    const isLight = isLightTheme(theme)
+    const isTech = isTechTheme(theme)
     
-    // Determine window background based on theme
-    let windowBg = isLightTheme ? '#ffffff' : '#1e1e1e'
-    if (isVercelTheme) windowBg = '#000000'
-    else if (isSupabaseTheme) windowBg = '#171717'
-    else if (isTailwindTheme) windowBg = '#1e293b'
-    else if (isTriggerTheme) windowBg = '#121317'
-    else if (isClerkTheme) windowBg = '#111111'
-    else if (isMintlifyTheme) windowBg = '#070a08'
-    else if (isPrismaTheme) windowBg = 'hsla(223, 41%, 7%, 75%)'
-    else if (isOpenAITheme) windowBg = '#232b41'
-    else if (isElevenLabsTheme) windowBg = '#111'
-    else if (isResendTheme) windowBg = 'hsla(0, 0%, 0%, 0.88)'
-    else if (isNuxtTheme) windowBg = '#0b0c11'
-    
-    // Determine controls background
-    let controlsBg = isLightTheme ? '#f5f5f5' : '#2d2d2d'
-    if (isVercelTheme) controlsBg = '#000000'
-    else if (isSupabaseTheme) controlsBg = '#1f1f1f'
-    else if (isTailwindTheme) controlsBg = '#1e293b'
-    else if (isTriggerTheme) controlsBg = '#16181d'
-    else if (isClerkTheme) controlsBg = '#191919'
-    else if (isMintlifyTheme) controlsBg = '#010201'
-    else if (isPrismaTheme) controlsBg = 'hsla(223, 41%, 7%, 75%)'
-    else if (isOpenAITheme) controlsBg = '#232b41'
-    else if (isElevenLabsTheme) controlsBg = '#111'
-    else if (isResendTheme) controlsBg = 'hsla(0, 0%, 0%, 0.9)'
-    else if (isNuxtTheme) controlsBg = '#0b0c11'
-    
-    // Determine border color
-    let borderColor = isLightTheme ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)'
-    if (isVercelTheme) borderColor = '#1a1a1a'
-    else if (isSupabaseTheme) borderColor = '#292929'
-    else if (isTailwindTheme) borderColor = 'rgb(255 255 255 / 10%)'
-    else if (isTriggerTheme) borderColor = '#272a2e'
-    else if (isClerkTheme) borderColor = '#353535'
-    else if (isMintlifyTheme) borderColor = '#141818'
-    else if (isPrismaTheme) borderColor = 'transparent'
-    else if (isOpenAITheme) borderColor = 'rgba(255, 255, 255, 0.1)'
-    else if (isElevenLabsTheme) borderColor = '#353535'
-    else if (isResendTheme) borderColor = 'hsla(0, 0%, 24%, 0.13)'
-    else if (isNuxtTheme) borderColor = 'transparent'
+    const windowBg = getWindowBackground(theme)
+    const controlsBg = getControlsBackground(theme)
+    const borderColor = getBorderColor(theme)
+    const frameBgStyle = getFrameBackgroundStyle(theme, background)
+    const titleColor = getWindowTitleColor(theme, isLight)
+    const lineNumberColor = getLineNumberColor(theme, isLight)
+    const gridlineColor = getGridlineColor(theme)
+    const showGridlines = shouldShowGridlines(theme)
+    const showTransparentPattern = shouldShowTransparentPattern(theme, background)
 
-    // Determine frame background style based on theme
-    const getFrameBackgroundStyle = () => {
-      // Check if user has selected a custom background (not the default)
-      const hasCustomBackground = background !== 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)'
-      
-      // If user selected a custom background (gradient, image, or solid color), use it
-      if (hasCustomBackground) {
-        if (background === 'transparent') {
-          return { backgroundColor: 'transparent' }
-        } else if (background.startsWith('/')) {
-          return {
-            backgroundImage: `url(${background})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }
-        } else if (background.startsWith('linear-gradient') || background.startsWith('radial-gradient')) {
-          return { backgroundImage: background }
-        } else {
-          return { backgroundColor: background }
-        }
-      }
-      
-      // Theme-specific frame backgrounds (only when using default background)
-      if (isVercelTheme) return { backgroundColor: '#000000' }
-      if (isSupabaseTheme) return { backgroundColor: '#121212' }
-      if (isTailwindTheme) return { backgroundColor: '#0f172a' }
-      if (isTriggerTheme) return { backgroundColor: '#121317' }
-      if (isClerkTheme) return { backgroundColor: '#222222' }
-      if (isMintlifyTheme) return { backgroundColor: '#121212' }
-      if (isPrismaTheme) return { background: 'linear-gradient(140deg, #0c1d26 0%, #0a0c17 100%)' }
-      if (isOpenAITheme) return { backgroundColor: '#121a29' }
-      if (isElevenLabsTheme) return { backgroundColor: '#111' }
-      if (isResendTheme) return { backgroundColor: '#000000' }
-      if (isNuxtTheme) return { backgroundColor: '#0b0c11' }
-      
-      // Default fallback
-      return { backgroundImage: background }
+    // Get border style for tech themes
+    const getBorderStyle = () => {
+      if (theme === 'supabase') return '1px solid #292929'
+      if (theme === 'tailwind') return '1px solid rgba(255, 255, 255, 0.1)'
+      if (theme === 'trigger') return 'none'
+      if (theme === 'clerk') return 'none'
+      if (theme === 'mintlify') return 'none'
+      if (theme === 'prisma') return '1px solid transparent'
+      if (theme === 'openai') return '0.5px solid rgba(255, 255, 255, 0.1)'
+      if (theme === 'elevenlabs') return '1px solid #353535'
+      if (theme === 'resend') return '0.5px solid hsla(0, 0%, 24%, 0.13)'
+      if (theme === 'nuxt') return '1px solid transparent'
+      return 'none'
     }
-
-    // Check if we should show transparent pattern overlay
-    const showTransparentPattern = background === 'transparent' && !isVercelTheme && !isSupabaseTheme && !isTailwindTheme && !isTriggerTheme && !isClerkTheme && !isMintlifyTheme && !isPrismaTheme && !isOpenAITheme && !isElevenLabsTheme && !isResendTheme && !isNuxtTheme
 
     return (
       <div
         ref={ref}
         style={{
-          ...getFrameBackgroundStyle(),
+          ...frameBgStyle,
           padding: `${padding}px`,
           position: 'relative',
         }}
@@ -488,47 +94,27 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
             minWidth: '500px',
             backgroundColor: windowBg,
             borderRadius: rounded ? '0.75rem' : '0',
-            boxShadow: isVercelTheme || isSupabaseTheme || isTailwindTheme || isTriggerTheme || isClerkTheme || isMintlifyTheme || isPrismaTheme || isOpenAITheme || isElevenLabsTheme || isResendTheme || isNuxtTheme
-              ? 'none'
-              : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            border: isSupabaseTheme ? '1px solid #292929' :
-                    isTailwindTheme ? '1px solid rgba(255, 255, 255, 0.1)' :
-                    isTriggerTheme ? 'none' :
-                    isClerkTheme ? 'none' :
-                    isMintlifyTheme ? 'none' :
-                    isPrismaTheme ? '1px solid transparent' :
-                    isOpenAITheme ? '0.5px solid rgba(255, 255, 255, 0.1)' :
-                    isElevenLabsTheme ? '1px solid #353535' :
-                    isResendTheme ? '0.5px solid hsla(0, 0%, 24%, 0.13)' :
-                    isNuxtTheme ? '1px solid transparent' :
-                    'none',
+            boxShadow: isTech ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: getBorderStyle(),
             position: 'relative',
             zIndex: 1,
           }}
         >
           {/* Theme-specific decorations - Gridlines */}
-          {(isVercelTheme || isTailwindTheme || isTriggerTheme || isElevenLabsTheme || isNuxtTheme) && (
+          {showGridlines && (
             <>
               {/* Horizontal gridlines */}
               <span 
                 className="absolute top-0 bottom-0 left-[-150px] w-[1200px] h-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : 
-                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
-                              isTriggerTheme ? '#272a2e' :
-                              isElevenLabsTheme ? '#353535' :
-                              isNuxtTheme ? 'transparent' : '#1a1a1a',
+                  background: gridlineColor,
                   top: 0,
                 }}
               />
               <span 
                 className="absolute top-0 bottom-0 left-[-150px] w-[1200px] h-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : 
-                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
-                              isTriggerTheme ? '#272a2e' :
-                              isElevenLabsTheme ? '#353535' :
-                              isNuxtTheme ? 'transparent' : '#1a1a1a',
+                  background: gridlineColor,
                   bottom: 0,
                   top: 'auto',
                 }}
@@ -537,22 +123,14 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
               <span 
                 className="absolute top-[-150px] bottom-0 left-0 w-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : 
-                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
-                              isTriggerTheme ? '#272a2e' :
-                              isElevenLabsTheme ? '#353535' :
-                              isNuxtTheme ? 'transparent' : '#1a1a1a',
+                  background: gridlineColor,
                   height: 'calc(100% + 300px)',
                 }}
               />
               <span 
                 className="absolute top-[-150px] bottom-0 right-0 w-px pointer-events-none z-0"
                 style={{ 
-                  background: isVercelTheme ? '#1a1a1a' : 
-                              isTailwindTheme ? 'rgba(255, 255, 255, 0.1)' :
-                              isTriggerTheme ? '#272a2e' :
-                              isElevenLabsTheme ? '#353535' :
-                              isNuxtTheme ? 'transparent' : '#1a1a1a',
+                  background: gridlineColor,
                   height: 'calc(100% + 300px)',
                 }}
               />
@@ -560,7 +138,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
           )}
           
           {/* Vercel Corner Brackets */}
-          {isVercelTheme && (
+          {theme === 'vercel' && (
             <>
               <span 
                 className="absolute top-[-12px] left-[-12px] w-[25px] h-[25px] pointer-events-none z-10"
@@ -600,7 +178,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
           )}
           
           {/* Prisma Gradient Borders */}
-          {isPrismaTheme && (
+          {theme === 'prisma' && (
             <>
               <span 
                 className="absolute inset-[-1px] rounded-[10px] pointer-events-none z-0"
@@ -627,7 +205,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
           )}
           
           {/* Nuxt Gradient Borders */}
-          {isNuxtTheme && (
+          {theme === 'nuxt' && (
             <>
               <span 
                 className="absolute inset-[-1px] rounded-[10px] pointer-events-none z-0"
@@ -658,18 +236,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
                 <div 
                   className="absolute left-1/2 -translate-x-1/2 text-xs font-medium truncate max-w-[60%]"
                   style={{ 
-                    color: isVercelTheme ? '#eeeeee' : 
-                           isSupabaseTheme ? '#fafafa' :
-                           isTailwindTheme ? '#e2e8f0' :
-                           isTriggerTheme ? '#b5b8c0' :
-                           isClerkTheme ? '#ffffff' :
-                           isMintlifyTheme ? '#55d799' :
-                           isPrismaTheme ? '#e2e8f0' :
-                           isOpenAITheme ? '#ffffff' :
-                           isElevenLabsTheme ? '#ffffff' :
-                           isResendTheme ? 'hsl(0, 0%, 98%)' :
-                           isNuxtTheme ? '#ffffff' :
-                           (isLightTheme ? '#666666' : '#cccccc') 
+                    color: titleColor,
                   }}
                   title={windowTitle}
                 >
@@ -697,7 +264,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
                 value={code}
                 onChange={(e) => onChange(e.target.value)}
                 className="absolute inset-0 w-full h-full p-6 bg-transparent text-transparent resize-none outline-none font-mono text-sm leading-relaxed z-10"
-                style={{ caretColor: isLightTheme ? '#000000' : '#ffffff' }}
+                style={{ caretColor: isLight ? '#000000' : '#ffffff' }}
                 spellCheck={false}
               />
             )}
@@ -713,19 +280,8 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
                         <span 
                           className="inline-block w-8 text-right mr-4 select-none"
                           style={{ 
-                            opacity: (isVercelTheme || isSupabaseTheme || isTailwindTheme || isTriggerTheme || isClerkTheme || isMintlifyTheme || isPrismaTheme || isOpenAITheme || isElevenLabsTheme || isResendTheme || isNuxtTheme) ? 1 : 0.4,
-                            color: isVercelTheme ? '#a0a0a0' :
-                                   isSupabaseTheme ? '#898989' :
-                                   isTailwindTheme ? '#64748b' :
-                                   isTriggerTheme ? '#5f6570' :
-                                   isClerkTheme ? '#666666' :
-                                   isMintlifyTheme ? '#4a5568' :
-                                   isPrismaTheme ? '#64748b' :
-                                   isOpenAITheme ? 'rgba(255, 255, 255, 0.2)' :
-                                   isElevenLabsTheme ? '#666666' :
-                                   isResendTheme ? '#666666' :
-                                   isNuxtTheme ? '#8b949e' :
-                                   (isLightTheme ? '#666666' : '#888888')
+                            opacity: isTech ? 1 : 0.4,
+                            color: lineNumberColor,
                           }}
                         >
                           {i + 1}
