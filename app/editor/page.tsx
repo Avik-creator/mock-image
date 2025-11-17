@@ -6,11 +6,11 @@ import { ImagePreview } from '@/components/image-preview'
 import { ControlPanel } from '@/components/control-panel'
 import { AnimationTimeline } from '@/components/animation-timeline'
 import { Button } from '@/components/ui/button'
-import { Download, Copy, Code, Image, Video, ArrowLeft, Globe, GripVertical } from 'lucide-react'
+import { Download, Copy, Code, Image, Video, ImagePlay, ArrowLeft, Globe, GripVertical } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
 import { AnimationLayer, AnimationType } from '@/types/animation'
-import { exportAsVideo } from '@/lib/video-export'
+import { exportAsVideo, exportAsGif } from '@/lib/video-export'
 import { ModeToggle } from '@/components/mode-toggle'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
@@ -56,8 +56,10 @@ export default function EditorPage() {
   const [urlDarkMode, setUrlDarkMode] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
-  const [isExporting, setIsExporting] = useState(false)
-  const [exportProgress, setExportProgress] = useState(0)
+  const [isExportingVideo, setIsExportingVideo] = useState(false)
+  const [videoExportProgress, setVideoExportProgress] = useState(0)
+  const [isExportingGif, setIsExportingGif] = useState(false)
+  const [gifExportProgress, setGifExportProgress] = useState(0)
 
   // Listen for animation frame progress events during video export
   useEffect(() => {
@@ -233,8 +235,12 @@ export default function EditorPage() {
       return
     }
 
-    setIsExporting(true)
-    setExportProgress(0)
+    const previousProgress = animationProgress
+    const wasAnimating = isAnimating
+
+    setIsAnimating(false)
+    setIsExportingVideo(true)
+    setVideoExportProgress(0)
     setAnimationProgress(0) // Reset animation progress at start
 
     try {
@@ -243,7 +249,7 @@ export default function EditorPage() {
         animationLayers,
         totalDuration,
         30,
-        (progress) => setExportProgress(progress)
+        (progress) => setVideoExportProgress(progress)
       )
 
       const url = URL.createObjectURL(videoBlob)
@@ -265,9 +271,59 @@ export default function EditorPage() {
         variant: 'destructive',
       })
     } finally {
-      setIsExporting(false)
-      setExportProgress(0)
-      setAnimationProgress(0) // Reset animation progress when done
+      setIsExportingVideo(false)
+      setVideoExportProgress(0)
+      setAnimationProgress(previousProgress) // Restore previous progress so the preview stays visible
+      setIsAnimating(wasAnimating)
+    }
+  }
+
+  const handleExportGif = async () => {
+    if (!previewRef.current || (!uploadedImage && !urlImage) || animationLayers.length === 0) {
+      toast({
+        title: 'No animation',
+        description: 'Add animations to export as GIF',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const previousProgress = animationProgress
+    const wasAnimating = isAnimating
+
+    setIsAnimating(false)
+    setIsExportingGif(true)
+    setGifExportProgress(0)
+    setAnimationProgress(0)
+
+    try {
+      const gifBlob = await exportAsGif(previewRef.current, totalDuration, 15, (progress) =>
+        setGifExportProgress(progress)
+      )
+
+      const url = URL.createObjectURL(gifBlob)
+      const link = document.createElement('a')
+      link.download = `snipp-animation-${Date.now()}.gif`
+      link.href = url
+      link.click()
+      URL.revokeObjectURL(url)
+
+      toast({
+        title: 'Success',
+        description: 'GIF exported successfully!',
+      })
+    } catch (error) {
+      console.error('[v0] GIF export error:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to export GIF. Try exporting as video instead.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsExportingGif(false)
+      setGifExportProgress(0)
+      setAnimationProgress(previousProgress)
+      setIsAnimating(wasAnimating)
     }
   }
 
@@ -427,16 +483,28 @@ export default function EditorPage() {
           </Link>
           <div className="flex items-center gap-2 ml-auto">
             {playground !== 'code' && currentImage && animationLayers.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportVideo}
-                disabled={isExporting}
-                className="gap-2"
-              >
-                <Video className="h-4 w-4" />
-                {isExporting ? `Exporting... ${Math.round(exportProgress)}%` : 'Export Video'}
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportGif}
+                  disabled={isExportingGif}
+                  className="gap-2"
+                >
+                  <ImagePlay className="h-4 w-4" />
+                  {isExportingGif ? `Exporting GIF... ${Math.round(gifExportProgress)}%` : 'Export GIF'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportVideo}
+                  disabled={isExportingVideo}
+                  className="gap-2"
+                >
+                  <Video className="h-4 w-4" />
+                  {isExportingVideo ? `Exporting... ${Math.round(videoExportProgress)}%` : 'Export Video'}
+                </Button>
+              </>
             )}
             <Button
               variant="outline"

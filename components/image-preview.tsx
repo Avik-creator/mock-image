@@ -225,7 +225,7 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
               style={animationStyles}
               className={`bg-card shadow-2xl overflow-hidden ${
                 rounded ? 'rounded-2xl' : 'rounded-lg'
-              } w-full max-w-6xl border border-border`}
+              } w-full max-w-6xl`}
             >
               <img
                 src={uploadedImage || "/placeholder.svg"}

@@ -172,39 +172,74 @@ export async function exportAsGif(
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
   const html2canvas = (await import('html2canvas-pro')).default
+  const { GIFEncoder, quantize, applyPalette } = await import('gifenc')
   
   convertCssVarsToRgba(element)
   
   try {
-    const totalFrames = Math.floor(totalDuration * fps)
-    const frames: HTMLCanvasElement[] = []
+    const initialCanvas = await html2canvas(element, {
+      backgroundColor: null,
+      scale: 2,
+      logging: false,
+    })
+
+    const width = initialCanvas.width
+    const height = initialCanvas.height
+    const totalFrames = Math.max(1, Math.floor(totalDuration * fps))
+    const frameInterval = 1000 / fps
+    const frames: ImageData[] = []
 
     for (let i = 0; i <= totalFrames; i++) {
-      const progress = (i / totalFrames) * 100
-      
+      const progress = totalFrames === 0 ? 100 : (i / totalFrames) * 100
+
       window.dispatchEvent(new CustomEvent('animation-frame-progress', { detail: progress }))
-      await new Promise(resolve => setTimeout(resolve, 16))
-      
-      const canvas = await html2canvas(element, {
+      await waitForNextFrame()
+      await waitForNextFrame()
+      await wait(10)
+
+      const frameCanvas = await html2canvas(element, {
         backgroundColor: null,
-        scale: 1,
+        scale: 2,
         logging: false,
+        useCORS: true,
+        allowTaint: false,
       })
-      
-      frames.push(canvas)
-      
-      if (onProgress) {
-        onProgress((i / totalFrames) * 100)
+
+      const ctx = frameCanvas.getContext('2d')
+      if (ctx) {
+        frames.push(ctx.getImageData(0, 0, width, height))
       }
-      
-      await new Promise(resolve => setTimeout(resolve, 1000 / fps))
+
+      if (onProgress) {
+        onProgress(Math.min(80, (i / Math.max(1, totalFrames)) * 80))
+      }
+
+      if (i < totalFrames) {
+        await wait(frameInterval)
+      }
     }
 
-    return new Promise<Blob>((resolve) => {
-      frames[0]?.toBlob((blob) => {
-        resolve(blob || new Blob())
+    const gif = GIFEncoder()
+    const delay = Math.max(2, Math.round(frameInterval / 10)) // delay in 1/100th seconds
+
+    frames.forEach((frame, index) => {
+      const palette = quantize(frame.data, 256)
+      const indexData = applyPalette(frame.data, palette, 'FloydSteinberg')
+      gif.writeFrame(indexData, width, height, {
+        palette,
+        delay,
+        disposal: 2,
+        transparent: true,
       })
+
+      if (onProgress) {
+        onProgress(80 + (index / Math.max(1, frames.length - 1)) * 20)
+      }
     })
+
+    gif.finish()
+    const bytes = gif.bytesView()
+    return new Blob([bytes], { type: 'image/gif' })
   } finally {
     removeColorFix()
   }
