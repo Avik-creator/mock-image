@@ -1,0 +1,12 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="sparkGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="45%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F97316" />
+    </radialGradient>
+  </defs>
+  <path d="M80 10L96 64L150 80L96 96L80 150L64 96L10 80L64 64L80 10Z" fill="url(#sparkGradient)" />
+  <circle cx="80" cy="80" r="24" fill="rgba(255,255,255,0.45)" />
+</svg>
+

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Upload } from 'lucide-react'
 import { AnimationLayer } from '@/types/animation'
 import { calculateAnimationStyles } from '@/lib/animation-calculator'
+import { OverlayLayer } from '@/components/overlay-layer'
 
 interface ImagePreviewProps {
   uploadedImage: string | null
@@ -156,7 +157,9 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
             ...getBackgroundStyle(),
             padding: `${padding}px`,
           }}
-          className={`flex ${uploadedImage ? 'items-start justify-center' : 'items-center justify-center'} min-h-[600px] rounded-xl`}
+          className={`relative flex ${
+            uploadedImage ? 'items-start justify-center' : 'items-center justify-center'
+          } min-h-[600px] rounded-xl`}
         >
           {!uploadedImage ? (
             <div className="text-center w-full max-w-2xl mx-auto">
@@ -220,7 +223,9 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           ) : (
             <div
               style={animationStyles}
-              className={`bg-card shadow-2xl overflow-hidden ${rounded ? 'rounded-2xl' : 'rounded-lg'} w-full max-w-6xl border border-border`}
+              className={`bg-card shadow-2xl overflow-hidden ${
+                rounded ? 'rounded-2xl' : 'rounded-lg'
+              } w-full max-w-6xl border border-border`}
             >
               <img
                 src={uploadedImage || "/placeholder.svg"}
@@ -230,6 +235,7 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
               />
             </div>
           )}
+          <OverlayLayer />
         </div>
 
         {uploadedImage && (

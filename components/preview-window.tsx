@@ -3,6 +3,7 @@
 import { forwardRef } from 'react'
 import { Highlight, themes } from 'prism-react-renderer'
 import { getTheme } from '@/lib/themes/theme-registry'
+import { OverlayLayer } from '@/components/overlay-layer'
 import {
   isLightTheme,
   isTechTheme,
@@ -75,7 +76,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
           padding: `${padding}px`,
           position: 'relative',
         }}
-        className="inline-block"
+        className="inline-block relative"
       >
         {/* Transparent pattern overlay */}
         {showTransparentPattern && (
@@ -297,6 +298,7 @@ export const PreviewWindow = forwardRef<HTMLDivElement, PreviewWindowProps>(
             </Highlight>
           </div>
         </div>
+        <OverlayLayer />
       </div>
     )
   }

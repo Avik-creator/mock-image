@@ -10,6 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Upload, X, Check } from 'lucide-react'
 import { useRef } from 'react'
 import * as React from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TextOverlayControls } from '@/components/text-overlay-controls'
+import { StickerControls } from '@/components/sticker-controls'
 
 interface ControlPanelProps {
   playground: 'code' | 'image'
@@ -896,6 +899,27 @@ export function ControlPanel({
             </div>
           </>
         )}
+      </div>
+
+      <div className="space-y-4 border-t border-border pt-4">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Overlays</p>
+          <p className="text-[11px] text-muted-foreground">
+            Add branded text or stickers to both code and image previews. Drag overlays directly in the preview window.
+          </p>
+        </div>
+        <Tabs defaultValue="text" className="space-y-4">
+          <TabsList className="grid grid-cols-2">
+            <TabsTrigger value="text">Text</TabsTrigger>
+            <TabsTrigger value="stickers">Stickers</TabsTrigger>
+          </TabsList>
+          <TabsContent value="text">
+            <TextOverlayControls />
+          </TabsContent>
+          <TabsContent value="stickers">
+            <StickerControls />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

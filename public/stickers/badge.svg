@@ -1,0 +1,13 @@
+<svg width="160" height="120" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="badgeGradient" x1="0" y1="0" x2="160" y2="0">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="20" width="140" height="80" rx="24" fill="url(#badgeGradient)" />
+  <rect x="20" y="35" width="120" height="50" rx="18" fill="rgba(255,255,255,0.18)" />
+  <circle cx="40" cy="60" r="10" fill="white" fill-opacity="0.8" />
+  <rect x="58" y="52" width="70" height="16" rx="8" fill="white" fill-opacity="0.8" />
+</svg>
+

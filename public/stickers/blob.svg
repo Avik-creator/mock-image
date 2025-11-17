@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="50%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#FDE68A" />
+    </linearGradient>
+  </defs>
+  <path d="M162 71.5C178 103 155 144 121 162.5C87 181 43 177 25 148.5C7 120 17 66.5 44 36C71 5.5 115 -11 143 12.5C170 36 146 40 162 71.5Z" fill="url(#blobGradient)" fill-opacity="0.95"/>
+</svg>
+
