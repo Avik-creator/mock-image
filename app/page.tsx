@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Code, Image, Globe, Sparkles, ArrowRight, Moon, Sun } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
+import { ImageComparisonShowcase } from '@/components/image-comparison-showcase'
 
 export default function LandingPage() {
   return (
@@ -119,6 +120,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <ImageComparisonShowcase />
 
       {/* CTA Section */}
       <section className="w-full flex items-center justify-center px-4 py-20 md:py-32">

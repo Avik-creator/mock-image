@@ -803,19 +803,19 @@ export function ControlPanel({
 
       {/* Toggles */}
       <div className="space-y-3 pt-2 border-t border-border">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="rounded" className="text-xs font-medium text-muted-foreground cursor-pointer">
-            Rounded Corners
-          </Label>
-          <Switch
-            id="rounded"
-            checked={rounded}
-            onCheckedChange={onRoundedChange}
-          />
-        </div>
-
-        {playground === 'code' && (
+        {playground === 'code' ? (
           <>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="rounded" className="text-xs font-medium text-muted-foreground cursor-pointer">
+                Rounded Corners
+              </Label>
+              <Switch
+                id="rounded"
+                checked={rounded}
+                onCheckedChange={onRoundedChange}
+              />
+            </div>
+
             {onWindowTitleChange && (
               <div className="space-y-2">
                 <Label className="text-xs font-medium text-muted-foreground">Window Title</Label>
@@ -898,6 +898,10 @@ export function ControlPanel({
               />
             </div>
           </>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Image exports now render with square corners for social previews.
+          </p>
         )}
       </div>
 

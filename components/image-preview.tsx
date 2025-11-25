@@ -11,7 +11,6 @@ interface ImagePreviewProps {
   uploadedImage: string | null
   background: string
   padding: number
-  rounded: boolean
   animationProgress: number
   animationLayers: AnimationLayer[]
   totalDuration: number
@@ -24,7 +23,6 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
       uploadedImage,
       background,
       padding,
-      rounded,
       animationProgress,
       animationLayers,
       totalDuration,
@@ -159,17 +157,15 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           }}
           className={`relative flex ${
             uploadedImage ? 'items-start justify-center' : 'items-center justify-center'
-          } min-h-[600px] rounded-xl`}
+          } min-h-[600px]`}
         >
           {!uploadedImage ? (
             <div className="text-center w-full max-w-2xl mx-auto">
               <div
-                className={`bg-card border-2 border-dashed transition-all p-12 md:p-16 cursor-pointer ${
+                className={`bg-card border-2 border-dashed transition-all p-12 md:p-16 cursor-pointer rounded-none ${
                   isDragging 
                     ? 'border-primary bg-primary/5 scale-[1.02]' 
                     : 'border-border hover:border-primary/50 hover:bg-accent/30'
-                } ${
-                  rounded ? 'rounded-2xl' : 'rounded-lg'
                 }`}
                 onClick={(e) => {
                   // Only trigger if clicking directly on the div, not on the button or its children
@@ -223,9 +219,7 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(
           ) : (
             <div
               style={animationStyles}
-              className={`bg-card shadow-2xl overflow-hidden ${
-                rounded ? 'rounded-2xl' : 'rounded-lg'
-              } w-full max-w-6xl`}
+              className="bg-card shadow-2xl overflow-hidden rounded-none w-full max-w-6xl"
             >
               <img
                 src={uploadedImage || "/placeholder.svg"}

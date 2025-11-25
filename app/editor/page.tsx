@@ -707,7 +707,6 @@ export default function EditorPage() {
                 uploadedImage={currentImage}
                 background={background}
                 padding={padding}
-                rounded={rounded}
                 animationLayers={animationLayers}
                 animationProgress={animationProgress}
                 totalDuration={totalDuration}
