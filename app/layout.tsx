@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         alt: 'Snippet - Turn Code into Beautiful Images',
       },
     ],
-    url: 'https://snippet.avikmukherjee.me',
+    url: 'https://snippet.avikmukherjee.com',
   },
   twitter: {
     card: 'summary_large_image',
